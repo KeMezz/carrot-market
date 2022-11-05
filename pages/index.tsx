@@ -23,7 +23,26 @@ const Home: NextPage = () => {
           </button>
         </div>
       </div>
-      <div className="bg-white p-10 rounded-2xl shadow-xl max-w-2xl w-full"></div>
+      <div className="bg-white overflow-hidden rounded-2xl shadow-xl max-w-2xl w-full">
+        <div className="bg-blue-500 p-6 pb-14">
+          <h1 className="text-white text-2xl font-bold">Profile</h1>
+        </div>
+        <div className="rounded-2xl relative -top-5 bg-white">
+          <div>
+            <h3>Orders</h3>
+            <p>340</p>
+          </div>
+          <div />
+          <div>
+            <h3>Spent</h3>
+            <p>$2,310</p>
+          </div>
+        </div>
+        <div>
+          <h2>Tony Molloy</h2>
+          <p>New York, USA</p>
+        </div>
+      </div>
       <div className="bg-white p-10 rounded-2xl shadow-xl max-w-2xl w-full"></div>
       <div className="bg-white p-10 rounded-2xl shadow-xl max-w-2xl w-full"></div>
     </section>
