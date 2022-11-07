@@ -43,7 +43,36 @@ const Home: NextPage = () => {
           <p>New York, USA</p>
         </div>
       </div>
-      <div className="bg-white p-10 rounded-2xl shadow-xl max-w-2xl w-full"></div>
+      <div className="bg-white p-10 rounded-2xl shadow-xl max-w-2xl w-full">
+        <section>
+          <button>⬅️</button>
+          <div><button>⭐️</button><span>4.9</span></div>
+          <div>❤️</div>
+        </section>
+        <div />
+        <section>
+          <div>
+            <h2>Swoon Lounge</h2>
+            <p>Chair</p>
+          </div>
+          <div>
+            <div>
+              <input type="radio" />
+              <input type="radio" />
+              <input type="radio" />
+            </div>
+            <div>
+              <button>-</button>
+              <span>1</span>
+              <button>-</button>
+            </div>
+          </div>
+          <div>
+            <h1>$450</h1>
+            <button>Add to cart</button>
+          </div>
+        </section>
+      </div>
       <div className="bg-white p-10 rounded-2xl shadow-xl max-w-2xl w-full"></div>
     </section>
   );
