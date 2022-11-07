@@ -27,19 +27,19 @@ const Home: NextPage = () => {
         <div className="bg-blue-500 p-6 pb-14">
           <h1 className="text-white text-2xl font-bold">Profile</h1>
         </div>
-        <div className="rounded-2xl p-6 relative -top-5 bg-white">
+        <div className="rounded-2xl p-6 pb-0 relative -top-5 bg-white">
           <div className="flex justify-between items-end relative">
-            <h3>Orders</h3>
+            <h3 className="font-bold">Orders</h3>
             <p>340</p>
           </div>
-          <div className="h-24 w-24 bg-red-400 rounded-full absolute" />
-          <div>
-            <h3>Spent</h3>
+          <div className="h-24 w-24 bg-red-400 rounded-full absolute -top-8 left-1/2 -translate-x-1/2" />
+          <div className="flex justify-between items-end">
+            <h3 className="font-bold">Spent</h3>
             <p>$2,310</p>
           </div>
         </div>
-        <div>
-          <h2>Tony Molloy</h2>
+        <div className="text-center pb-6">
+          <h2 className="font-bold text-xl">Tony Molloy</h2>
           <p>New York, USA</p>
         </div>
       </div>
