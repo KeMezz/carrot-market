@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 
 const Home: NextPage = () => {
   return (
-    <section className="bg-slate-400 py-20 px-10 flex flex-col space-y-10 items-center">
+    <section className="bg-slate-400 py-10 px-8 flex flex-col space-y-10 items-center">
       <div className="bg-white p-8 rounded-2xl shadow-xl max-w-2xl w-full">
         <h1 className="font-semibold text-3xl">Select Item</h1>
         <div className="flex justify-between my-2">
