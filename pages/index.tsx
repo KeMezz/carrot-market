@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 
 const Home: NextPage = () => {
   return (
-    <section className="bg-slate-400 py-10 px-8 flex flex-col space-y-10 items-center">
+    <section className="bg-slate-400 py-10 px-8 flex flex-col space-y-10 items-center min-h-screen">
       <div className="bg-white p-8 rounded-2xl shadow-xl max-w-2xl w-full">
         <h1 className="font-semibold text-3xl">Select Item</h1>
         <div className="flex justify-between my-2">
@@ -43,35 +43,37 @@ const Home: NextPage = () => {
           <p>New York, USA</p>
         </div>
       </div>
-      <div className="bg-white p-10 rounded-2xl shadow-xl max-w-2xl w-full">
-        <section>
+      <div className="bg-white p-6 pt-10 rounded-2xl shadow-xl max-w-2xl w-full">
+        <div className="flex justify-between items-center mb-5">
           <button>⬅️</button>
-          <div><button>⭐️</button><span>4.9</span></div>
-          <div>❤️</div>
-        </section>
-        <div />
-        <section>
-          <div>
-            <h2>Swoon Lounge</h2>
-            <p>Chair</p>
+          <div className="space-x-3">
+            <button>⭐️4.9</button>
+            <button className="shadow-xl p-2 rounded-md">❤️</button>
           </div>
-          <div>
+        </div>
+        <div className="bg-zinc-400 h-72" />
+        <div className="mt-3 mb-5">
+          <div className="mb-3">
+            <h2 className="font-medium">Swoon Lounge</h2>
+            <p className="text-xs text-gray-500">Chair</p>
+          </div>
+          <div className="flex justify-between items-center">
             <div>
               <input type="radio" />
               <input type="radio" />
               <input type="radio" />
             </div>
-            <div>
-              <button>-</button>
+            <div className="flex items-center space-x-5">
+              <button className="p-1.5 bg-blue-200 flex justify-center items-center aspect-square w-8 h-8 text-gray-700 rounded-lg">-</button>
               <span>1</span>
-              <button>-</button>
+              <button className="p-1.5 bg-blue-200 flex justify-center items-center aspect-square w-8 h-8 text-gray-700 rounded-lg">+</button>
             </div>
           </div>
-          <div>
-            <h1>$450</h1>
-            <button>Add to cart</button>
+          <div className="flex justify-between items-center mt-4">
+            <h1 className="font-medium text-2xl">$450</h1>
+            <button className="bg-blue-500 text-center text-white rounded-lg py-2 px-10">Add to cart</button>
           </div>
-        </section>
+        </div>
       </div>
       <div className="bg-white p-10 rounded-2xl shadow-xl max-w-2xl w-full"></div>
     </section>
