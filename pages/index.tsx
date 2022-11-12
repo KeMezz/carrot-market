@@ -64,14 +64,20 @@ const Home: NextPage = () => {
               <button className="w-5 h-5 rounded-full bg-teal-500 focus:ring-2 ring-offset-2 ring-teal-500 transition" />
             </div>
             <div className="flex items-center space-x-5">
-              <button className="p-1.5 bg-blue-200 flex justify-center items-center aspect-square w-8 h-8 text-gray-700 rounded-lg">-</button>
+              <button className="p-1.5 bg-blue-200 flex justify-center items-center aspect-square w-8 h-8 text-gray-700 rounded-lg">
+                -
+              </button>
               <span>1</span>
-              <button className="p-1.5 bg-blue-200 flex justify-center items-center aspect-square w-8 h-8 text-gray-700 rounded-lg">+</button>
+              <button className="p-1.5 bg-blue-200 flex justify-center items-center aspect-square w-8 h-8 text-gray-700 rounded-lg">
+                +
+              </button>
             </div>
           </div>
           <div className="flex justify-between items-center mt-4">
             <h1 className="font-medium text-2xl">$450</h1>
-            <button className="bg-blue-500 text-center text-white rounded-lg py-2 px-10">Add to cart</button>
+            <button className="bg-blue-500 text-center text-white rounded-lg py-2 px-10">
+              Add to cart
+            </button>
           </div>
         </div>
       </div>
