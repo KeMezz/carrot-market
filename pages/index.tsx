@@ -3,27 +3,7 @@ import type { NextPage } from "next";
 const Home: NextPage = () => {
   return (
     <section className="bg-slate-400 py-10 px-8 flex flex-col space-y-10 items-center min-h-screen">
-      <form className="bg-blue-500 p-5 flex flex-col w-full space-y-3 focus-within:bg-blue-300">
-        <input
-          type="text"
-          required
-          placeholder="Username"
-          className="required:border-2 border-yellow-400 placeholder-shown:bg-green-300"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="peer"
-          required
-          // className="invalid:bg-red-500"
-          // className="valid:bg-teal-500"
-        />
-        <span className="hidden peer-invalid:block  peer-invalid:text-red-500">
-          Password is Invalid
-        </span>
-        <input type="submit" value="Login" className="bg-white" />
-      </form>
-      <div className="bg-white p-8 rounded-2xl shadow-xl max-w-2xl w-full">
+      <div className="bg-white sm:bg-red-400 md:bg-teal-400 lg:bg-indigo-400 xl:bg-orange-400 2xl:bg-yellow-400 p-8 rounded-2xl shadow-xl max-w-2xl w-full">
         <h1 className="font-semibold text-3xl">Select Item</h1>
         <div className="flex justify-between my-2">
           <span className="text-gray-500">Grey Chair</span>
