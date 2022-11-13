@@ -2,15 +2,15 @@ import type { NextPage } from "next";
 
 const Home: NextPage = () => {
   return (
-    <section className="bg-slate-400 py-10 px-8 min-h-screen grid gap-10 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 place-content-center">
-      <div className="bg-white p-8 rounded-2xl shadow-xl w-full">
+    <section className="bg-slate-400 dark:bg-slate-900 py-10 px-8 min-h-screen grid gap-10 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 place-content-center">
+      <div className="bg-white dark:bg-gray-800 dark:text-white p-8 rounded-2xl shadow-xl w-full">
         <h1 className="font-semibold text-3xl">Select Item</h1>
         <div className="flex justify-between my-2">
-          <span className="text-gray-500">Grey Chair</span>
+          <span className="text-gray-500 dark:text-gray-100">Grey Chair</span>
           <span className="font-semibold">$19</span>
         </div>
         <div className="flex justify-between my-2 ">
-          <span className="text-gray-500">Tooly Table</span>
+          <span className="text-gray-500 dark:text-gray-100">Tooly Table</span>
           <span className="font-semibold">$21</span>
         </div>
         <div className="flex justify-between mt-2 pt-2 border-t-2 border-dashed">
@@ -18,16 +18,16 @@ const Home: NextPage = () => {
           <span className="font-semibold">$40</span>
         </div>
         <div className="flex justify-center">
-          <button className="mt-5 mx-auto bg-blue-500 p-3 text-white rounded-xl w-2/3 self-center text-center hover:bg-teal-500 hover:text-black active:bg-yellow-500 focus:bg-red-500 transition-colors">
+          <button className="mt-5 mx-auto bg-blue-500 dark:bg-blue-900 p-3 text-white rounded-xl w-2/3 self-center text-center hover:bg-teal-500 hover:text-black active:bg-yellow-500 focus:bg-red-500 transition-colors">
             Checkout
           </button>
         </div>
       </div>
-      <div className="bg-white overflow-hidden rounded-2xl shadow-xl w-full group">
-        <div className="bg-blue-500 p-6 pb-14">
+      <div className="bg-white dark:bg-gray-800 dark:text-white overflow-hidden rounded-2xl shadow-xl w-full group">
+        <div className="bg-blue-500 dark:bg-blue-900 p-6 pb-14">
           <h1 className="text-white text-2xl font-bold">Profile</h1>
         </div>
-        <div className="rounded-2xl p-6 pb-0 relative -top-5 bg-white">
+        <div className="rounded-2xl p-6 pb-0 relative -top-5 bg-white dark:bg-gray-800">
           <div className="flex justify-between items-end relative">
             <h3 className="font-bold">Orders</h3>
             <p>340</p>
@@ -43,7 +43,7 @@ const Home: NextPage = () => {
           <p>New York, USA</p>
         </div>
       </div>
-      <div className="bg-white p-6 pt-10 rounded-2xl shadow-xl w-full lg:col-span-2 2xl:col-span-1">
+      <div className="bg-white dark:bg-gray-800 dark:text-white p-6 pt-10 rounded-2xl shadow-xl w-full lg:col-span-2 2xl:col-span-1">
         <div className="flex justify-between items-center mb-5">
           <button>⬅️</button>
           <div className="space-x-3">
@@ -75,7 +75,7 @@ const Home: NextPage = () => {
           </div>
           <div className="flex justify-between items-center mt-4">
             <h1 className="font-medium text-2xl">$450</h1>
-            <button className="bg-blue-500 text-center text-white rounded-lg py-2 px-10">
+            <button className="bg-blue-500 dark:bg-blue-800 text-center text-white rounded-lg py-2 px-10">
               Add to cart
             </button>
           </div>
