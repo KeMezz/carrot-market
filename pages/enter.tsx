@@ -1,5 +1,9 @@
 import { useState } from "react";
 
+function cls(...classNames: string[]) {
+  return classNames.join(" ");
+}
+
 function Enter() {
   const [method, setMethod] = useState<"email" | "phone">("email");
   const onEmailClick = () => setMethod("email");
@@ -9,10 +13,30 @@ function Enter() {
       <h3 className="text-3xl font-bold text-center">Enter to Carrot</h3>
       <section className="mt-16">
         <div className="flex flex-col items-center">
-          <h5 className="text-sm">Enter using:</h5>
-          <div className="flex gap-4">
-            <button onClick={onEmailClick}>Email address</button>
-            <button onClick={onPhoneClick}>Phone number</button>
+          <h5 className="text-sm text-gray-500 font-medium">Enter using:</h5>
+          <div className="grid border-b w-full grid-cols-2 mt-8">
+            <button
+              className={cls(
+                "pb-4 border-b-2",
+                method === "email"
+                  ? "border-orange-400 text-orange-400 font-bold"
+                  : "text-gray-500"
+              )}
+              onClick={onEmailClick}
+            >
+              Email address
+            </button>
+            <button
+              className={cls(
+                "pb-4 border-b-2",
+                method === "phone"
+                  ? "border-orange-400 text-orange-400 font-bold"
+                  : "text-gray-500"
+              )}
+              onClick={onPhoneClick}
+            >
+              Phone number
+            </button>
           </div>
         </div>
         <form>
