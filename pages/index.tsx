@@ -3,7 +3,7 @@ import type { NextPage } from "next";
 const Home: NextPage = () => {
   return (
     <div className="flex flex-col space-y-5 py-10">
-      {[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].map((_, i) => (
+      {Array.from({ length: 15 }, (_, i) => i).map((_, i) => (
         <div
           key={i}
           className="flex border-b pb-4 cursor-pointer justify-between px-4"
