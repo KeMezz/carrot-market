@@ -1,6 +1,6 @@
 import { NextPage } from "next";
 
-const Sold: NextPage = () => {
+const Loved: NextPage = () => {
   return (
     <div className="flex flex-col space-y-5 py-10">
       {Array.from({ length: 15 }, (_, i) => i).map((_, i) => (
@@ -58,4 +58,4 @@ const Sold: NextPage = () => {
   );
 };
 
-export default Sold;
+export default Loved;
