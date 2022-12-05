@@ -21,7 +21,7 @@ export default function Layout({
     <div>
       <div
         className={cls(
-          !canGoBack ? "justify-center" : "",
+          !canGoBack ? "justify-center" : "gap-4",
           "bg-white w-full max-w-xl text-lg font-medium py-3 px-4 fixed text-gray-800 border-b top-0 flex items-center"
         )}
       >
