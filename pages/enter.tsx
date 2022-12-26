@@ -16,7 +16,6 @@ const Enter: NextPage = () => {
         <p>🥕</p>
         <h1 className="font-bold">Enter to Karrot</h1>
       </div>
-      <p className="text-center my-8 text-gray-500">Enter using:</p>
       <div className="flex">
         <LoginMethodBtn
           isActive={loginMethod === "email"}
