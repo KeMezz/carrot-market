@@ -18,7 +18,7 @@ const FooterIcon: NextPage<FooterIconProps> = ({ d, name }) => {
       >
         <path strokeLinecap="round" strokeLinejoin="round" d={d} />
       </svg>
-      <p className="text-sm">{name}</p>
+      <p className="text-xs">{name}</p>
     </div>
   );
 };
