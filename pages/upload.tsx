@@ -1,10 +1,13 @@
 import Layout from "../components/layout";
+import SubmitBtn from "../components/submitBtn";
+import Textarea from "../components/textarea";
+import TextInput from "../components/textInput";
 
 const Upload = () => {
   return (
     <Layout canGoBack>
-      <div className="p-4">
-        <div className="h-56 border-dashed w-full border-2 border-slate-300 rounded-md flex justify-center items-center">
+      <div className="p-4 space-y-4">
+        <div className="my-12 h-56 border-dashed w-full border-2 border-slate-300 rounded-md flex justify-center items-center">
           <svg
             className="h-12 w-12"
             stroke="currentColor"
@@ -20,7 +23,12 @@ const Upload = () => {
             />
           </svg>
         </div>
-        <div></div>
+        <section className="space-y-4">
+          <TextInput name="상품명" placeholder="상품명을 입력해주세요" />
+          <TextInput name="가격" placeholder="0" sign="$" unit="USD" />
+          <Textarea name="설명" />
+        </section>
+        <SubmitBtn title="상품 업로드" />
       </div>
     </Layout>
   );
