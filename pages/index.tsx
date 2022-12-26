@@ -6,7 +6,7 @@ import Product from "../components/product";
 
 const Home: NextPage = () => {
   const { push } = useRouter();
-  const goToUpload = () => push("/upload");
+  const goToUpload = () => push("/items/upload");
   return (
     <Layout title="홈">
       <div className="divide-y">
