@@ -24,9 +24,19 @@ const Upload = () => {
           </svg>
         </div>
         <section className="space-y-4">
-          <TextInput name="상품명" placeholder="상품명을 입력해주세요" />
-          <TextInput name="가격" placeholder="0" sign="$" unit="USD" />
-          <Textarea name="설명" />
+          <TextInput
+            name="상품명"
+            placeholder="상품명을 입력해주세요"
+            id="name"
+          />
+          <TextInput
+            name="가격"
+            placeholder="0"
+            sign="$"
+            unit="USD"
+            id="price"
+          />
+          <Textarea name="설명" id="description" />
         </section>
         <SubmitBtn title="상품 업로드" />
       </div>
