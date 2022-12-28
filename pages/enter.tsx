@@ -1,9 +1,9 @@
 import { NextPage } from "next";
 import { useState } from "react";
-import ExternalLoginBtn from "../components/externalLoginBtn";
-import LoginMethodBtn from "../components/loginMethodBtn";
-import SubmitBtn from "../components/submitBtn";
-import TextInput from "../components/textInput";
+import ExternalLoginBtn from "../components/atom/externalLoginBtn";
+import LoginMethodBtn from "../components/atom/loginMethodBtn";
+import SubmitBtn from "../components/atom/submitBtn";
+import TextInput from "../components/atom/textInput";
 
 type method = "email" | "phone";
 

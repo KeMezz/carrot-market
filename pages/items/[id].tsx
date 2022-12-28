@@ -1,8 +1,8 @@
 import { NextPage } from "next";
-import GridProduct from "../../components/gridProduct";
-import Layout from "../../components/layout";
-import Profile from "../../components/profile";
-import SubmitBtn from "../../components/submitBtn";
+import GridProduct from "../../components/molecule/gridProduct";
+import Layout from "../../components/template/layout";
+import Profile from "../../components/molecule/profile";
+import SubmitBtn from "../../components/atom/submitBtn";
 
 const ItemDetail: NextPage = () => {
   return (

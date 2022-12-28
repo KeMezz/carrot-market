@@ -1,7 +1,7 @@
-import Layout from "../../components/layout";
-import SubmitBtn from "../../components/submitBtn";
-import Textarea from "../../components/textarea";
-import TextInput from "../../components/textInput";
+import Layout from "../../components/template/layout";
+import SubmitBtn from "../../components/atom/submitBtn";
+import Textarea from "../../components/atom/textarea";
+import TextInput from "../../components/atom/textInput";
 
 const Upload = () => {
   return (

@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import { cls } from "../libs/utils";
+import { cls } from "../../libs/utils";
 import InputLabel from "./inputLabel";
 
 interface TextInputProps {

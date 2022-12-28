@@ -8,7 +8,7 @@ interface GridProductProps {
 const GridProduct: NextPage<GridProductProps> = ({ title, price }) => {
   return (
     <div>
-      <div className="w-full h-56 bg-slate-300 mb-3" />
+      <div className="w-full h-56 bg-slate-300 mb-3 rounded-lg" />
       <h4 className="font-semibold">{title}</h4>
       <p>${price}</p>
     </div>

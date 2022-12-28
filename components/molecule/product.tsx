@@ -1,4 +1,4 @@
-import ProductIcon from "./productIcon";
+import ProductIcon from "../atom/productIcon";
 
 const Product = () => {
   return (
