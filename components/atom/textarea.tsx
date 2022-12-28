@@ -2,7 +2,7 @@ import { NextPage } from "next";
 import InputLabel from "./inputLabel";
 
 interface TextareaProps {
-  name: string;
+  name?: string;
   id: string;
   placeholder?: string;
 }
@@ -10,7 +10,7 @@ interface TextareaProps {
 const Textarea: NextPage<TextareaProps> = ({ name, id, placeholder }) => {
   return (
     <div className="flex flex-col gap-2">
-      <InputLabel id={id} name={name} />
+      {name ? <InputLabel id={id} name={name} /> : null}
       <div className="flex items-center">
         <textarea
           id={id}
