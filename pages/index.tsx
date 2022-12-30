@@ -14,7 +14,7 @@ const Home: NextPage = () => {
           <Product key={i} />
         ))}
       </div>
-      <FloatingBtn onClick={goToUpload} />
+      <FloatingBtn onClick={goToUpload} d="M12 4.5v15m7.5-7.5h-15" />
     </Layout>
   );
 };
