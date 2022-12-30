@@ -1,4 +1,5 @@
 import { NextPage } from "next";
+import ChatInput from "../../components/molecule/chatInput";
 import ReceivedBubble from "../../components/molecule/receivedBubble";
 import SendBubble from "../../components/molecule/sendBubble";
 import Layout from "../../components/template/layout";
@@ -11,6 +12,7 @@ const ChatDetail: NextPage = () => {
         <SendBubble message="I want ₩20,000." />
         <ReceivedBubble message="미쳤어" />
       </section>
+      <ChatInput />
     </Layout>
   );
 };
