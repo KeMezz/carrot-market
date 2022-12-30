@@ -11,8 +11,10 @@ const CommunityDetail: NextPage = () => {
   return (
     <Layout canGoBack>
       <section className="flex flex-col p-4 gap-4">
-        <CommunityCategory category="동네질문" />
-        <Profile />
+        <div className="border-b">
+          <CommunityCategory category="동네질문" />
+          <Profile />
+        </div>
         <CommunityQuestion question="What is the best mandu restaurant?" />
         <div className="flex gap-6 border-t border-b py-3">
           <ReactionBtn

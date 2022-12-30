@@ -8,8 +8,10 @@ const ItemDetail: NextPage = () => {
   return (
     <Layout canGoBack title="Galaxy S50">
       <section className="p-4 ">
-        <div className="w-full h-96 bg-slate-300 rounded-md" />
-        <Profile />
+        <div className="border-b">
+          <div className="w-full h-96 bg-slate-300 rounded-md" />
+          <Profile />
+        </div>
         <div className="flex flex-col gap-4 py-4 my-4">
           <h2 className="text-3xl font-bold">Galaxy S50</h2>
           <h3 className="text-xl">$140</h3>

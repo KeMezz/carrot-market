@@ -2,7 +2,7 @@ import { NextPage } from "next";
 
 const Profile: NextPage = () => {
   return (
-    <div className="flex items-center gap-4 border-b py-4">
+    <div className="flex items-center gap-4 py-4">
       <div className="w-14 h-14 rounded-full bg-slate-300" />
       <div>
         <p className="font-semibold">Steve Jobs</p>
