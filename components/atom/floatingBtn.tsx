@@ -8,7 +8,7 @@ interface FloatingBtnProps {
 const FloatingBtn: NextPage<FloatingBtnProps> = ({ onClick, d }) => {
   return (
     <button
-      className="w-16 h-16 rounded-full bg-orange-400 fixed bottom-28 right-4 shadow-lg flex justify-center items-center cursor-pointer"
+      className="w-16 h-16 rounded-full bg-orange-400 fixed right-4 bottom-28 shadow-lg flex justify-center items-center cursor-pointer"
       onClick={onClick}
     >
       <svg
