@@ -1,7 +1,7 @@
 import Layout from "../../components/template/layout";
-import SubmitBtn from "../../components/atom/submitBtn";
+import FilledBtn from "../../components/atom/filled-btn";
 import Textarea from "../../components/atom/textarea";
-import TextInput from "../../components/atom/textInput";
+import TextInput from "../../components/atom/text-input";
 
 const Upload = () => {
   return (
@@ -41,7 +41,7 @@ const Upload = () => {
           />
           <Textarea name="설명" id="description" />
         </section>
-        <SubmitBtn title="상품 업로드" />
+        <FilledBtn title="상품 업로드" />
       </div>
     </Layout>
   );

@@ -1,8 +1,8 @@
 import { NextPage } from "next";
-import GridProduct from "../../components/molecule/gridProduct";
+import GridProduct from "../../components/molecule/grid-product";
 import Layout from "../../components/template/layout";
 import Profile from "../../components/molecule/profile";
-import SubmitBtn from "../../components/atom/submitBtn";
+import FilledBtn from "../../components/atom/filled-btn";
 
 const ItemDetail: NextPage = () => {
   return (
@@ -24,7 +24,7 @@ const ItemDetail: NextPage = () => {
             minima id aspernatur magnam. Error, nihil.
           </p>
           <div className="flex items-center gap-4">
-            <SubmitBtn title="Talk to seller" />
+            <FilledBtn title="Talk to seller" />
             <div className="flex justify-center w-8 text-gray-400">
               <svg
                 xmlns="http://www.w3.org/2000/svg"

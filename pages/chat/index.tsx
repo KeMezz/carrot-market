@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import ChatPreview from "../../components/molecule/chatPreview";
+import ChatPreview from "../../components/molecule/chat-preview";
 import Layout from "../../components/template/layout";
 
 const Chat: NextPage = () => {

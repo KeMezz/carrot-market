@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
-import FloatingBtn from "../../components/atom/floatingBtn";
-import StreamPreview from "../../components/molecule/streamPreview";
+import FloatingBtn from "../../components/atom/floating-btn";
+import StreamPreview from "../../components/molecule/stream-preview";
 import Layout from "../../components/template/layout";
 
 const Streams = () => {

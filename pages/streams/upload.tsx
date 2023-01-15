@@ -1,7 +1,7 @@
 import { NextPage } from "next";
-import SubmitBtn from "../../components/atom/submitBtn";
+import FilledBtn from "../../components/atom/filled-btn";
 import Textarea from "../../components/atom/textarea";
-import TextInput from "../../components/atom/textInput";
+import TextInput from "../../components/atom/text-input";
 import Layout from "../../components/template/layout";
 
 const UploadStream: NextPage = () => {
@@ -11,7 +11,7 @@ const UploadStream: NextPage = () => {
         <TextInput name="상품명" id="name" />
         <TextInput name="가격" id="price" />
         <Textarea name="설명" id="description" />
-        <SubmitBtn title="Go live" />
+        <FilledBtn title="Go live" />
       </section>
     </Layout>
   );

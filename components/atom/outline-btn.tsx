@@ -4,7 +4,7 @@ interface ExteranlLoginBtnProps {
   d: string;
 }
 
-const ExternalLoginBtn: NextPage<ExteranlLoginBtnProps> = ({ d }) => {
+const OutlineBtn: NextPage<ExteranlLoginBtnProps> = ({ d }) => {
   return (
     <button className="flex justify-center items-center p-3 border rounded-md text-gray-500 cursor-pointer hover:text-orange-400 hover:border-orange-400 transition-colors">
       <svg
@@ -19,4 +19,4 @@ const ExternalLoginBtn: NextPage<ExteranlLoginBtnProps> = ({ d }) => {
   );
 };
 
-export default ExternalLoginBtn;
+export default OutlineBtn;

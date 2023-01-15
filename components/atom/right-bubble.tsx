@@ -1,10 +1,10 @@
 import { NextPage } from "next";
 
-interface SendBubbleProps {
+interface RightBubbleProps {
   message: string;
 }
 
-const SendBubble: NextPage<SendBubbleProps> = ({ message }) => {
+const RightBubble: NextPage<RightBubbleProps> = ({ message }) => {
   return (
     <div className="flex gap-4 self-end justify-end">
       <div className="p-2 border rounded-lg max-w-[80%]">
@@ -15,4 +15,4 @@ const SendBubble: NextPage<SendBubbleProps> = ({ message }) => {
   );
 };
 
-export default SendBubble;
+export default RightBubble;

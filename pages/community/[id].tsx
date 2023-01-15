@@ -1,11 +1,11 @@
 import { NextPage } from "next";
-import CommunityCategory from "../../components/atom/communityCategory";
-import CommunityQuestion from "../../components/atom/communityQuestion";
-import ReactionBtn from "../../components/atom/reactionBtn";
-import SubmitBtn from "../../components/atom/submitBtn";
+import CommunityCategory from "../../components/atom/chip";
+import ReactionBtn from "../../components/atom/reaction-btn-big";
+import FilledBtn from "../../components/atom/filled-btn";
 import Textarea from "../../components/atom/textarea";
 import Profile from "../../components/molecule/profile";
 import Layout from "../../components/template/layout";
+import CommunityQuestion from "../../components/molecule/community-question";
 
 const CommunityDetail: NextPage = () => {
   return (
@@ -44,7 +44,7 @@ const CommunityDetail: NextPage = () => {
           </div>
         </div>
         <Textarea id="answer" placeholder="Answer the question!" />
-        <SubmitBtn title="Reply" />
+        <FilledBtn title="Reply" />
       </section>
     </Layout>
   );

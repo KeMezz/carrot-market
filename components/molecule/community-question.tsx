@@ -1,14 +1,14 @@
-import { NextPage } from "next";
+import React from "react";
 
 interface CommunityQuestionProps {
   question: string;
 }
 
-const CommunityQuestion: NextPage<CommunityQuestionProps> = ({ question }) => {
+const CommunityQuestion = ({ question }: CommunityQuestionProps) => {
   return (
     <h2 className="text-lg flex gap-1">
       <span className="text-orange-400">Q.</span>
-      {question}{" "}
+      {question}
     </h2>
   );
 };

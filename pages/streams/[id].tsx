@@ -1,7 +1,7 @@
-import ChatInput from "../../components/molecule/chatInput";
-import ReceivedBubble from "../../components/molecule/receivedBubble";
-import SendBubble from "../../components/molecule/sendBubble";
+import ChatInput from "../../components/molecule/chat-input";
+import LeftBubble from "../../components/atom/left-bubble";
 import Layout from "../../components/template/layout";
+import RightBubble from "../../components/atom/right-bubble";
 
 const StreamDetail = () => {
   return (
@@ -12,18 +12,18 @@ const StreamDetail = () => {
           <h1 className="text-2xl font-semibold mt-4">Let us try potatos</h1>
         </div>
         <div className="flex flex-col gap-4 w-full overflow-y-scroll h-[50vh] py-2">
-          <ReceivedBubble message="How much are you selling them for?" />
-          <SendBubble message="I want ₩20,000." />
-          <ReceivedBubble message="How much are you selling them for?" />
-          <SendBubble message="I want ₩20,000." />
-          <ReceivedBubble message="How much are you selling them for?" />
-          <SendBubble message="I want ₩20,000." />
-          <ReceivedBubble message="How much are you selling them for?" />
-          <SendBubble message="I want ₩20,000." />
-          <ReceivedBubble message="How much are you selling them for?" />
-          <SendBubble message="I want ₩20,000." />
-          <ReceivedBubble message="How much are you selling them for?" />
-          <SendBubble message="I want ₩20,000." />
+          <LeftBubble message="How much are you selling them for?" />
+          <RightBubble message="I want ₩20,000." />
+          <LeftBubble message="How much are you selling them for?" />
+          <RightBubble message="I want ₩20,000." />
+          <LeftBubble message="How much are you selling them for?" />
+          <RightBubble message="I want ₩20,000." />
+          <LeftBubble message="How much are you selling them for?" />
+          <RightBubble message="I want ₩20,000." />
+          <LeftBubble message="How much are you selling them for?" />
+          <RightBubble message="I want ₩20,000." />
+          <LeftBubble message="How much are you selling them for?" />
+          <RightBubble message="I want ₩20,000." />
         </div>
       </section>
       <ChatInput />

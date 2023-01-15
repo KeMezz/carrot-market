@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import InputLabel from "./inputLabel";
+import InputLabel from "./input-label";
 
 interface TextareaProps {
   name?: string;

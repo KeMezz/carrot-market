@@ -1,8 +1,7 @@
 import { NextPage } from "next";
-import EmptyStar from "../../components/atom/emptyStar";
-import FilledStar from "../../components/atom/filledStar";
+import StarRating from "../../components/atom/star-rating";
 import Profile from "../../components/molecule/profile";
-import ProfileBtn from "../../components/molecule/profileBtn";
+import ProfileBtn from "../../components/atom/profile-button";
 import Layout from "../../components/template/layout";
 
 const MyKarrot: NextPage = () => {
@@ -31,13 +30,7 @@ const MyKarrot: NextPage = () => {
             <div className="bg-slate-400 w-14 h-14 rounded-full" />
             <div>
               <h3 className="font-medium">니꼬</h3>
-              <div className="flex">
-                <FilledStar />
-                <FilledStar />
-                <FilledStar />
-                <FilledStar />
-                <EmptyStar />
-              </div>
+              <StarRating rate={4} />
             </div>
           </div>
           <p>

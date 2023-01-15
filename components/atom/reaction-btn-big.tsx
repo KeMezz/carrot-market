@@ -6,7 +6,7 @@ interface ReactionBtnProps {
   count: number;
 }
 
-const ReactionBtn: NextPage<ReactionBtnProps> = ({ title, d, count }) => {
+const ReactionBtnBig: NextPage<ReactionBtnProps> = ({ title, d, count }) => {
   return (
     <button className="flex gap-2 items-center">
       <svg
@@ -25,4 +25,4 @@ const ReactionBtn: NextPage<ReactionBtnProps> = ({ title, d, count }) => {
   );
 };
 
-export default ReactionBtn;
+export default ReactionBtnBig;

@@ -1,10 +1,10 @@
 import { NextPage } from "next";
 
-interface ReceivedBubbleProps {
+interface LeftBubbleProps {
   message: string;
 }
 
-const ReceivedBubble: NextPage<ReceivedBubbleProps> = ({ message }) => {
+const LeftBubble: NextPage<LeftBubbleProps> = ({ message }) => {
   return (
     <div className="flex gap-4 self-start justify-start">
       <div className="w-10 h-10 rounded-full bg-slate-400" />
@@ -15,4 +15,4 @@ const ReceivedBubble: NextPage<ReceivedBubbleProps> = ({ message }) => {
   );
 };
 
-export default ReceivedBubble;
+export default LeftBubble;

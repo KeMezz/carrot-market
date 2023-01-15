@@ -1,7 +1,6 @@
 import { NextPage } from "next";
-import FloatingBtn from "../../components/atom/floatingBtn";
-import ReactionBtn from "../../components/atom/reactionBtn";
-import CommunityPost from "../../components/molecule/communityPost";
+import FloatingBtn from "../../components/atom/floating-btn";
+import CommunityPost from "../../components/molecule/community-post";
 import Layout from "../../components/template/layout";
 
 const Community: NextPage = () => {

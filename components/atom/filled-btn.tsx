@@ -1,10 +1,10 @@
 import { NextPage } from "next";
 
-interface SubmitBtnProps {
+interface FilledBtnProps {
   title: string;
 }
 
-const SubmitBtn: NextPage<SubmitBtnProps> = ({ title }) => {
+const FilledBtn: NextPage<FilledBtnProps> = ({ title }) => {
   return (
     <button
       type="submit"
@@ -15,4 +15,4 @@ const SubmitBtn: NextPage<SubmitBtnProps> = ({ title }) => {
   );
 };
 
-export default SubmitBtn;
+export default FilledBtn;
