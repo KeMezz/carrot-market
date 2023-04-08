@@ -4,12 +4,26 @@ import OutlineBtn from "../components/atom/outline-btn";
 import TabBtn from "../components/atom/tab-btn";
 import FilledBtn from "../components/atom/filled-btn";
 import TextInput from "../components/atom/text-input";
+import { useForm } from "react-hook-form";
 
 type method = "email" | "phone";
 
+interface EnterForm {
+  email?: string;
+  phone?: string;
+}
+
 const Enter: NextPage = () => {
+  const { register, reset, handleSubmit } = useForm<EnterForm>();
   const [loginMethod, setLoginMethod] = useState<method>("email");
-  const changeMethod = (targetMethod: method) => setLoginMethod(targetMethod);
+  const changeMethod = (targetMethod: method) => {
+    reset();
+    setLoginMethod(targetMethod);
+  };
+  const onValid = (data: EnterForm) => {
+    console.log(data);
+  };
+
   return (
     <>
       <div className="h-48 flex flex-col justify-center items-center text-center text-3xl gap-2">
@@ -28,15 +42,25 @@ const Enter: NextPage = () => {
           title="Phone Number"
         />
       </div>
-      <form className="space-y-6 p-4 my-4">
+      <form className="space-y-6 p-4 my-4" onSubmit={handleSubmit(onValid)}>
         {loginMethod === "email" ? (
           <>
-            <TextInput id="email" name="Email Address" />
+            <TextInput
+              register={register("email", { required: true })}
+              type="email"
+              id="email"
+              name="Email Address"
+            />
             <FilledBtn title="Get login link" />
           </>
         ) : (
           <>
-            <TextInput id="phone" name="Phone Number" />
+            <TextInput
+              register={register("phone", { required: true })}
+              type="number"
+              id="phone"
+              name="Phone Number"
+            />
             <FilledBtn title="Get one-time password" />
           </>
         )}
