@@ -5,6 +5,7 @@ import TabBtn from "../components/atom/tab-btn";
 import FilledBtn from "../components/atom/filled-btn";
 import TextInput from "../components/atom/text-input";
 import { useForm } from "react-hook-form";
+import useMutation from "../libs/client/useMutation";
 
 type method = "email" | "phone";
 
@@ -14,14 +15,16 @@ interface EnterForm {
 }
 
 const Enter: NextPage = () => {
+  const [enter, { loading, data, error }] = useMutation("/api/users/enter");
   const { register, reset, handleSubmit } = useForm<EnterForm>();
   const [loginMethod, setLoginMethod] = useState<method>("email");
   const changeMethod = (targetMethod: method) => {
     reset();
     setLoginMethod(targetMethod);
   };
-  const onValid = (data: EnterForm) => {
-    console.log(data);
+
+  const onValid = (validForm: EnterForm) => {
+    enter(validForm);
   };
 
   return (
@@ -51,7 +54,7 @@ const Enter: NextPage = () => {
               id="email"
               name="Email Address"
             />
-            <FilledBtn title="Get login link" />
+            <FilledBtn title={!loading ? "Get login link" : "Loading..."} />
           </>
         ) : (
           <>
@@ -61,7 +64,9 @@ const Enter: NextPage = () => {
               id="phone"
               name="Phone Number"
             />
-            <FilledBtn title="Get one-time password" />
+            <FilledBtn
+              title={!loading ? "Get one-time password" : "Loading..."}
+            />
           </>
         )}
       </form>
