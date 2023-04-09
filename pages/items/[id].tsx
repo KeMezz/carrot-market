@@ -1,8 +1,8 @@
 import { NextPage } from "next";
-import GridProduct from "../../components/molecule/grid-product";
-import Layout from "../../components/template/layout";
-import Profile from "../../components/molecule/profile";
-import FilledBtn from "../../components/atom/filled-btn";
+import GridProduct from "@components/molecule/grid-product";
+import Layout from "@components/template/layout";
+import Profile from "@components/molecule/profile";
+import FilledBtn from "@components/atom/filled-btn";
 
 const ItemDetail: NextPage = () => {
   return (

@@ -1,11 +1,11 @@
 import { NextPage } from "next";
 import { useState } from "react";
-import OutlineBtn from "../components/atom/outline-btn";
-import TabBtn from "../components/atom/tab-btn";
-import FilledBtn from "../components/atom/filled-btn";
-import TextInput from "../components/atom/text-input";
+import OutlineBtn from "@components/atom/outline-btn";
+import TabBtn from "@components/atom/tab-btn";
+import FilledBtn from "@components/atom/filled-btn";
+import TextInput from "@components/atom/text-input";
 import { useForm } from "react-hook-form";
-import useMutation from "../libs/client/useMutation";
+import useMutation from "@libs/client/useMutation";
 
 type method = "email" | "phone";
 

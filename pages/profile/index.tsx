@@ -1,8 +1,8 @@
 import { NextPage } from "next";
-import StarRating from "../../components/atom/star-rating";
-import Profile from "../../components/molecule/profile";
-import ProfileBtn from "../../components/atom/profile-button";
-import Layout from "../../components/template/layout";
+import StarRating from "@components/atom/star-rating";
+import Profile from "@components/molecule/profile";
+import ProfileBtn from "@components/atom/profile-button";
+import Layout from "@components/template/layout";
 
 const MyKarrot: NextPage = () => {
   return (

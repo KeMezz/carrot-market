@@ -1,8 +1,8 @@
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import FloatingBtn from "../components/atom/floating-btn";
-import Layout from "../components/template/layout";
-import Product from "../components/molecule/product";
+import FloatingBtn from "@components/atom/floating-btn";
+import Layout from "@components/template/layout";
+import Product from "@components/molecule/product";
 
 const Home: NextPage = () => {
   const { push } = useRouter();

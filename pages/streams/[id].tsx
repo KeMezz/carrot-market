@@ -1,7 +1,7 @@
-import ChatInput from "../../components/molecule/chat-input";
-import LeftBubble from "../../components/atom/left-bubble";
-import Layout from "../../components/template/layout";
-import RightBubble from "../../components/atom/right-bubble";
+import ChatInput from "@components/molecule/chat-input";
+import LeftBubble from "@components/atom/left-bubble";
+import Layout from "@components/template/layout";
+import RightBubble from "@components/atom/right-bubble";
 
 const StreamDetail = () => {
   return (

@@ -1,6 +1,6 @@
 import { NextPage } from "next";
-import Product from "../../components/molecule/product";
-import Layout from "../../components/template/layout";
+import Product from "@components/molecule/product";
+import Layout from "@components/template/layout";
 
 const Sold: NextPage = () => {
   return (

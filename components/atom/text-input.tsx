@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import { cls } from "../../libs/client/utils";
+import { cls } from "@libs/client/utils";
 import InputLabel from "./input-label";
 import type { UseFormRegisterReturn } from "react-hook-form";
 

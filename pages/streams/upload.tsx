@@ -1,8 +1,8 @@
 import { NextPage } from "next";
-import FilledBtn from "../../components/atom/filled-btn";
-import Textarea from "../../components/atom/textarea";
-import TextInput from "../../components/atom/text-input";
-import Layout from "../../components/template/layout";
+import FilledBtn from "@components/atom/filled-btn";
+import Textarea from "@components/atom/textarea";
+import TextInput from "@components/atom/text-input";
+import Layout from "@components/template/layout";
 
 const UploadStream: NextPage = () => {
   return (
