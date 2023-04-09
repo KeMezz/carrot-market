@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
-import { cls } from "../../libs/utils";
+import { cls } from "../../libs/client/utils";
 import FooterIcon from "../molecule/footer-icon";
 
 interface LayoutProps {

@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import { cls } from "../../libs/utils";
+import { cls } from "../../libs/client/utils";
 
 interface LoginMethodBtnProps {
   onClick: React.MouseEventHandler<HTMLButtonElement>;
