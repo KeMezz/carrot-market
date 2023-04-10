@@ -11,6 +11,7 @@ interface TextInputProps {
   unit?: string;
   type: string;
   register: UseFormRegisterReturn;
+  maxLength?: number;
 }
 
 const TextInput: NextPage<TextInputProps> = ({
@@ -21,6 +22,7 @@ const TextInput: NextPage<TextInputProps> = ({
   unit,
   type,
   register,
+  maxLength,
 }) => {
   return (
     <div className="flex flex-col gap-2">
@@ -32,6 +34,7 @@ const TextInput: NextPage<TextInputProps> = ({
           id={id}
           type={type}
           placeholder={placeholder}
+          maxLength={maxLength}
           className={cls(
             "appearance-none w-full border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-orange-400 focus:border-orange-400",
             sign !== undefined ? "pl-8" : ""

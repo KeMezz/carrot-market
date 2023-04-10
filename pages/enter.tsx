@@ -1,11 +1,12 @@
 import { NextPage } from "next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import OutlineBtn from "@components/atom/outline-btn";
 import TabBtn from "@components/atom/tab-btn";
 import FilledBtn from "@components/atom/filled-btn";
 import TextInput from "@components/atom/text-input";
 import { useForm } from "react-hook-form";
 import useMutation from "@libs/client/useMutation";
+import { ResponseType } from "@libs/server/withHandler";
 
 type method = "email" | "phone";
 
@@ -14,9 +15,20 @@ interface EnterForm {
   phone?: string;
 }
 
+interface TokenForm {
+  token: string;
+}
+
 const Enter: NextPage = () => {
-  const [enter, { loading, data, error }] = useMutation("/api/users/enter");
+  const [enter, { loading, data }] =
+    useMutation<ResponseType>("/api/users/enter");
+  const [confirmToken, { loading: tokenLoading, data: tokenData }] =
+    useMutation<ResponseType>("/api/users/confirm");
+
   const { register, reset, handleSubmit } = useForm<EnterForm>();
+  const { register: tokenRegister, handleSubmit: tokenHandleSubmit } =
+    useForm<TokenForm>();
+
   const [loginMethod, setLoginMethod] = useState<method>("email");
   const changeMethod = (targetMethod: method) => {
     reset();
@@ -24,8 +36,19 @@ const Enter: NextPage = () => {
   };
 
   const onValid = (validForm: EnterForm) => {
+    if (loading) return;
     enter(validForm);
   };
+  const onTokenValid = (validForm: TokenForm) => {
+    if (tokenLoading) return;
+    confirmToken(validForm);
+  };
+
+  useEffect(() => {
+    if (data?.success) {
+      reset();
+    }
+  }, [data?.success, reset]);
 
   return (
     <>
@@ -33,43 +56,75 @@ const Enter: NextPage = () => {
         <p>🥕</p>
         <h1 className="font-bold">Enter to Karrot</h1>
       </div>
-      <div className="flex">
-        <TabBtn
-          isActive={loginMethod === "email"}
-          onClick={() => changeMethod("email")}
-          title="Email Address"
-        />
-        <TabBtn
-          isActive={loginMethod === "phone"}
-          onClick={() => changeMethod("phone")}
-          title="Phone Number"
-        />
-      </div>
-      <form className="space-y-6 p-4 my-4" onSubmit={handleSubmit(onValid)}>
-        {loginMethod === "email" ? (
-          <>
+      {data?.success ? null : (
+        <div className="flex">
+          <TabBtn
+            isActive={loginMethod === "email"}
+            onClick={() => changeMethod("email")}
+            title="Email Address"
+          />
+          <TabBtn
+            isActive={loginMethod === "phone"}
+            onClick={() => changeMethod("phone")}
+            title="Phone Number"
+          />
+        </div>
+      )}
+      {data?.success ? (
+        <>
+          <form
+            className="space-y-6 p-4 my-4"
+            onSubmit={tokenHandleSubmit(onTokenValid)}
+          >
             <TextInput
-              register={register("email", { required: true })}
-              type="email"
-              id="email"
-              name="Email Address"
-            />
-            <FilledBtn title={!loading ? "Get login link" : "Loading..."} />
-          </>
-        ) : (
-          <>
-            <TextInput
-              register={register("phone", { required: true })}
+              register={tokenRegister("token", {
+                required: true,
+                disabled: tokenLoading,
+                maxLength: 6,
+              })}
               type="number"
-              id="phone"
-              name="Phone Number"
+              id="token"
+              name="Confirmation Token"
+              maxLength={6}
             />
-            <FilledBtn
-              title={!loading ? "Get one-time password" : "Loading..."}
-            />
-          </>
-        )}
-      </form>
+            <FilledBtn title={!tokenLoading ? "Confirm Token" : "Loading..."} />
+          </form>
+        </>
+      ) : (
+        <>
+          <form className="space-y-6 p-4 my-4" onSubmit={handleSubmit(onValid)}>
+            {loginMethod === "email" ? (
+              <>
+                <TextInput
+                  register={register("email", {
+                    required: true,
+                    disabled: loading,
+                  })}
+                  type="email"
+                  id="email"
+                  name="Email Address"
+                />
+                <FilledBtn title={!loading ? "Get login link" : "Loading..."} />
+              </>
+            ) : (
+              <>
+                <TextInput
+                  register={register("phone", {
+                    required: true,
+                    disabled: loading,
+                  })}
+                  type="number"
+                  id="phone"
+                  name="Phone Number"
+                />
+                <FilledBtn
+                  title={!loading ? "Get one-time password" : "Loading..."}
+                />
+              </>
+            )}
+          </form>
+        </>
+      )}
       <div className="flex flex-col justify-center">
         <p className="text-center bg-white z-10 w-fit mx-auto px-4">
           or enter with
