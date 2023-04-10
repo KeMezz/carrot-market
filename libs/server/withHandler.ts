@@ -3,6 +3,11 @@ import { NextApiRequest, NextApiResponse } from "next";
 type Method = "GET" | "POST" | "DELETE";
 type Handler = (req: NextApiRequest, res: NextApiResponse) => Promise<void>;
 
+export interface ResponseType {
+  success: boolean;
+  [key: string]: any;
+}
+
 export default function withHandler(method: Method, handler: Handler) {
   return async function (req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== method) {
