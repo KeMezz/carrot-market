@@ -13,7 +13,8 @@
     "next": "13.0.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-hook-form": "^7.43.9"
+    "react-hook-form": "^7.43.9",
+    "twilio": "^4.10.0"
   },
   "devDependencies": {
     "@types/node": "18.11.9",
