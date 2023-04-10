@@ -2,6 +2,7 @@ import twilio from "twilio";
 import { NextApiRequest, NextApiResponse } from "next";
 import client from "@libs/server/client";
 import withHandler, { ResponseType } from "@libs/server/withHandler";
+import nodemailerClient from "@libs/server/email";
 
 const twilioClient = twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
 
@@ -38,6 +39,21 @@ async function handler(
       body: `Your login token is ${payload}`,
     });
     console.log(msg);
+  } else if (email) {
+    const mailOptions = {
+      from: process.env.MAIL_ID,
+      to: email,
+      subject: "Carrot Market Authentication Code",
+      text: `Your login token is ${payload}`,
+    };
+    nodemailerClient.sendMail(mailOptions, (error, response) => {
+      if (error) {
+        return res.status(500).json({ success: false, ...error });
+      } else {
+        return res.json({ success: true, ...response });
+      }
+    });
+    nodemailerClient.close();
   }
 
   return res.json({
