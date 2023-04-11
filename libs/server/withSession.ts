@@ -1,4 +1,4 @@
-import { withIronSessionApiRoute } from "iron-session/next/dist";
+import { withIronSessionApiRoute } from "iron-session/next";
 import { NextApiRequest, NextApiResponse } from "next";
 
 declare module "iron-session" {
@@ -20,5 +20,5 @@ export function withApiSession(
     res: NextApiResponse
   ) => Promise<void | NextApiResponse<any>>
 ) {
-  withIronSessionApiRoute(handlerFn, cookieOptions);
+  return withIronSessionApiRoute(handlerFn, cookieOptions);
 }

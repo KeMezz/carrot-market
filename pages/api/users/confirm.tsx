@@ -8,14 +8,21 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ) {
   const { token } = req.body;
-  const exists = await client.token.findUnique({
-    where: { payload: token },
+  const foundToken = await client.token.findUnique({
+    where: {
+      payload: token,
+    },
   });
-  if (!exists) return res.status(404).json({ success: false });
+  if (!foundToken) return res.status(404).json({ success: false });
   req.session.user = {
-    id: exists.userId,
+    id: foundToken.userId,
   };
   await req.session.save();
+  await client.token.deleteMany({
+    where: {
+      userId: foundToken.userId,
+    },
+  });
   return res.status(200).json({ success: true });
 }
 
