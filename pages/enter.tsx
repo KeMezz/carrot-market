@@ -7,6 +7,7 @@ import TextInput from "@components/atom/text-input";
 import { useForm } from "react-hook-form";
 import useMutation from "@libs/client/useMutation";
 import { ResponseType } from "@libs/server/withHandler";
+import { useRouter } from "next/router";
 
 type method = "email" | "phone";
 
@@ -49,6 +50,14 @@ const Enter: NextPage = () => {
       reset();
     }
   }, [data?.success, reset]);
+
+  const router = useRouter();
+  useEffect(() => {
+    console.log("TD", tokenData);
+    if (tokenData?.success) {
+      router.push("/");
+    }
+  }, [tokenData, router]);
 
   return (
     <>
