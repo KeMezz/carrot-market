@@ -3,10 +3,14 @@ import { useRouter } from "next/router";
 import FloatingBtn from "@components/atom/floating-btn";
 import Layout from "@components/template/layout";
 import Product from "@components/molecule/product";
+import useUser from "@libs/client/useUser";
 
 const Home: NextPage = () => {
-  const { push } = useRouter();
-  const goToUpload = () => push("/items/upload");
+  const router = useRouter();
+  const goToUpload = () => router.push("/items/upload");
+  const user = useUser();
+  console.log(user);
+
   return (
     <Layout title="홈">
       <div className="divide-y">
