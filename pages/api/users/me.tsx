@@ -13,4 +13,6 @@ async function handler(
   res.json({ success: true, profile });
 }
 
-export default withApiSession(withHandler("GET", handler));
+export default withApiSession(
+  withHandler({ method: "GET", handlerFn: handler })
+);

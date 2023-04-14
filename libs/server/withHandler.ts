@@ -8,13 +8,26 @@ export interface ResponseType {
   [key: string]: any;
 }
 
-export default function withHandler(method: Method, handler: Handler) {
+interface Config {
+  method: Method;
+  handlerFn: Handler;
+  isPrivate?: boolean;
+}
+
+export default function withHandler({
+  method,
+  handlerFn,
+  isPrivate = true,
+}: Config) {
   return async function (req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== method) {
       return res.status(405).end();
     }
+    if (isPrivate && !req.session.user) {
+      return res.status(401).json({ success: false, error: "please log in" });
+    }
     try {
-      await handler(req, res);
+      await handlerFn(req, res);
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error });
