@@ -7,7 +7,7 @@ import useUser from "@libs/client/useUser";
 
 const Home: NextPage = () => {
   const router = useRouter();
-  const goToUpload = () => router.push("/items/upload");
+  const goToUpload = () => router.push("/products/upload");
   const { user, isLoading } = useUser();
   return (
     <Layout title="홈">
