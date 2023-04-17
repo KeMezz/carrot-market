@@ -7,9 +7,15 @@ import useUser from "@libs/client/useUser";
 import useSWR from "swr";
 import { Product } from "@prisma/client";
 
+interface ProductWithCounts extends Product {
+  _count: {
+    favs: number;
+  };
+}
+
 interface ProductsResponse {
   success: boolean;
-  products: Product[];
+  products: ProductWithCounts[];
 }
 
 const Home: NextPage = () => {
@@ -17,7 +23,6 @@ const Home: NextPage = () => {
   const goToUpload = () => router.push("/products/upload");
   const { user, isLoading } = useUser();
   const { data } = useSWR<ProductsResponse>("/api/products");
-  console.log(data);
   return (
     <Layout title="홈">
       <div className="divide-y">
@@ -28,8 +33,8 @@ const Home: NextPage = () => {
             title={product.name}
             color="Black"
             price={product.price}
-            heart={1}
-            comment={1}
+            heart={product._count.favs}
+            comment={0}
           />
         ))}
       </div>

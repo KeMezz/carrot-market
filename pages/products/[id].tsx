@@ -4,7 +4,7 @@ import Layout from "@components/template/layout";
 import Profile from "@components/molecule/profile";
 import FilledBtn from "@components/atom/filled-btn";
 import { useRouter } from "next/router";
-import useSWR, { useSWRConfig } from "swr";
+import useSWR from "swr";
 import { Product } from "@prisma/client";
 import useMutation from "@libs/client/useMutation";
 import { cls } from "@libs/client/utils";
@@ -90,7 +90,7 @@ const ItemDetail: NextPage = () => {
             </button>
           </div>
         </div>
-        {data?.relatedProducts ? (
+        {data && data.relatedProducts.length > 0 ? (
           <div className="mt-8">
             <h3 className="text-2xl font-semibold">Similar items</h3>
             <div className="grid grid-cols-2 py-4 gap-4">
