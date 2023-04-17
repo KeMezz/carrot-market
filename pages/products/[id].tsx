@@ -4,7 +4,7 @@ import Layout from "@components/template/layout";
 import Profile from "@components/molecule/profile";
 import FilledBtn from "@components/atom/filled-btn";
 import { useRouter } from "next/router";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import { Product } from "@prisma/client";
 import useMutation from "@libs/client/useMutation";
 import { cls } from "@libs/client/utils";
@@ -24,14 +24,16 @@ interface ProductDetailResponse {
 
 const ItemDetail: NextPage = () => {
   const router = useRouter();
-  const { data, mutate } = useSWR<ProductDetailResponse>(
+  const { data, mutate: boundMutate } = useSWR<ProductDetailResponse>(
     router.query.id ? `/api/products/${router.query.id}` : null
   );
+  // const { mutate: refetch } = useSWRConfig();
   const [toggleFav] = useMutation(`/api/products/${router.query.id}/fav`);
   const onFavClick = () => {
     toggleFav({});
     if (!data) return;
-    mutate({ ...data, isLiked: !data.isLiked }, false);
+    boundMutate((prev) => prev && { ...prev, isLiked: !data.isLiked }, false);
+    // refetch("/api/users/me");
   };
   console.log(data?.isLiked);
   return (
