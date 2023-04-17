@@ -3,26 +3,43 @@ import GridProduct from "@components/molecule/grid-product";
 import Layout from "@components/template/layout";
 import Profile from "@components/molecule/profile";
 import FilledBtn from "@components/atom/filled-btn";
+import { useRouter } from "next/router";
+import useSWR from "swr";
+import { Product } from "@prisma/client";
+
+interface ProductDetailResponse {
+  success: boolean;
+  relatedProducts: Product[];
+  product: {
+    user: {
+      id: number;
+      name: string;
+      avatar: string;
+    };
+  } & Product;
+}
 
 const ItemDetail: NextPage = () => {
+  const router = useRouter();
+  console.log(router.query);
+  const { data } = useSWR<ProductDetailResponse>(
+    router.query.id ? `/api/products/${router.query.id}` : null
+  );
+  console.log(data);
   return (
-    <Layout canGoBack title="Galaxy S50">
+    <Layout canGoBack title={data?.product.name}>
       <section className="p-4 ">
         <div className="border-b">
           <div className="w-full h-96 bg-slate-300 rounded-md" />
-          <Profile />
+          <Profile
+            userId={data?.product.userId!}
+            name={data?.product.user.name!}
+          />
         </div>
         <div className="flex flex-col gap-4 py-4 my-4">
-          <h2 className="text-3xl font-bold">Galaxy S50</h2>
-          <h3 className="text-xl">$140</h3>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Maiores
-            esse minima eligendi blanditiis. Mollitia vitae voluptatibus
-            exercitationem, a minus fugiat impedit error deleniti dolore. Facere
-            ducimus eum ratione facilis in ipsa nisi placeat nemo nesciunt
-            expedita neque quos assumenda perferendis aliquam cumque vel, sit
-            minima id aspernatur magnam. Error, nihil.
-          </p>
+          <h2 className="text-3xl font-bold">{data?.product.name}</h2>
+          <h3 className="text-xl">${data?.product.price}</h3>
+          <p>{data?.product.description}</p>
           <div className="flex items-center gap-4">
             <FilledBtn title="Talk to seller" />
             <div className="flex justify-center w-8 text-gray-400">
@@ -43,14 +60,21 @@ const ItemDetail: NextPage = () => {
             </div>
           </div>
         </div>
-        <div className="mt-8">
-          <h3 className="text-2xl font-semibold">Similar items</h3>
-          <div className="grid grid-cols-2 py-4 gap-4">
-            {Array.from({ length: 5 }, (_, i) => i).map((i) => (
-              <GridProduct key={i} title="Galaxy S60" price={6} />
-            ))}
+        {data?.relatedProducts ? (
+          <div className="mt-8">
+            <h3 className="text-2xl font-semibold">Similar items</h3>
+            <div className="grid grid-cols-2 py-4 gap-4">
+              {data?.relatedProducts.map((product) => (
+                <GridProduct
+                  key={product.id}
+                  productId={product.id}
+                  title={product.name}
+                  price={product.price}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        ) : null}
       </section>
     </Layout>
   );
