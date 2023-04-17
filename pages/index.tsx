@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import FloatingBtn from "@components/atom/floating-btn";
 import Layout from "@components/template/layout";
-import ProductCard from "@components/molecule/product";
+import ProductCard from "@components/molecule/product-card";
 import useUser from "@libs/client/useUser";
 import useSWR from "swr";
 import { Product } from "@prisma/client";
@@ -23,6 +23,7 @@ const Home: NextPage = () => {
       <div className="divide-y">
         {data?.products.map((product) => (
           <ProductCard
+            id={product.id}
             key={product.id}
             title={product.name}
             color="Black"

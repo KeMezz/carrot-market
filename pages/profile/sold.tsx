@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import Product from "@components/molecule/product";
+import Product from "@components/molecule/product-card";
 import Layout from "@components/template/layout";
 
 const Sold: NextPage = () => {
