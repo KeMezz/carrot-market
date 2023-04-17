@@ -9,18 +9,18 @@ export interface ResponseType {
 }
 
 interface Config {
-  method: Method;
+  methods: Method[];
   handlerFn: Handler;
   isPrivate?: boolean;
 }
 
 export default function withHandler({
-  method,
+  methods,
   handlerFn,
   isPrivate = true,
 }: Config) {
   return async function (req: NextApiRequest, res: NextApiResponse) {
-    if (req.method !== method) {
+    if (!methods.includes(req.method as Method)) {
       return res.status(405).end();
     }
     if (isPrivate && !req.session.user) {
