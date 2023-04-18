@@ -9,6 +9,7 @@ import CommunityQuestion from "@components/molecule/community-question";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 import { Answer, Post } from "@prisma/client";
+import { useForm } from "react-hook-form";
 
 interface UserEssential {
   id: number;
@@ -36,6 +37,7 @@ const CommunityDetail: NextPage = () => {
     router.query.id ? `/api/posts/${router.query.id}` : null
   );
   console.log(data);
+  const { register, handleSubmit } = useForm();
 
   return (
     <Layout canGoBack>
@@ -71,7 +73,11 @@ const CommunityDetail: NextPage = () => {
             </div>
           </div>
         ))}
-        <Textarea id="answer" placeholder="Answer the question!" />
+        <Textarea
+          id="answer"
+          register={register("answer", { required: true })}
+          placeholder="Answer the question!"
+        />
         <FilledBtn title="Reply" />
       </section>
     </Layout>
