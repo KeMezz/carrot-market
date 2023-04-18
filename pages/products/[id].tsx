@@ -38,7 +38,7 @@ const ItemDetail: NextPage = () => {
   console.log(data?.isLiked);
   return (
     <Layout canGoBack title={data?.product.name}>
-      <section className="p-4 ">
+      <section className="p-4">
         <div className="border-b">
           <div className="w-full h-96 bg-slate-300 rounded-md" />
           <Profile
