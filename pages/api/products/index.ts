@@ -17,7 +17,8 @@ async function handler(
         },
       },
     });
-    return res.json({ success: true, products });
+    if (!products) return res.status(404).json({ success: false });
+    else return res.json({ success: true, products });
   }
   if (req.method === "POST") {
     const {
@@ -38,5 +39,8 @@ async function handler(
 }
 
 export default withApiSession(
-  withHandler({ methods: ["GET", "POST"], handlerFn: handler })
+  withHandler({
+    methods: ["GET", "POST"],
+    handlerFn: handler,
+  })
 );

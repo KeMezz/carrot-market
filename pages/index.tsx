@@ -21,6 +21,10 @@ interface ProductsResponse {
 const Home: NextPage = () => {
   const { user, isLoading } = useUser();
   const { data } = useSWR<ProductsResponse>("/api/products");
+  console.log(data);
+  if (data && !data.success) {
+    return null;
+  }
   return (
     <Layout title="홈">
       <div className="divide-y">
