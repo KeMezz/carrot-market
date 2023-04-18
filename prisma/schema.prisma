@@ -12,16 +12,19 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  phone     String?   @unique
-  email     String?   @unique
+  id        Int        @id @default(autoincrement())
+  phone     String?    @unique
+  email     String?    @unique
   avatar    String?
   name      String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   tokens    Token[]
   products  Product[]
   favs      Fav[]
+  posts     Post[]
+  answers   Answer[]
+  interests Interest[]
 }
 
 model Token {
@@ -61,4 +64,44 @@ model Fav {
 
   @@index([userId])
   @@index([productId])
+}
+
+model Post {
+  id        Int        @id @default(autoincrement())
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  question  String     @db.MediumText
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  answers   Answer[]
+  interests Interest[]
+
+  @@index([userId])
+}
+
+model Answer {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  answer    String   @db.MediumText
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([postId])
+}
+
+model Interest {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([postId])
 }
