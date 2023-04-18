@@ -1,6 +1,7 @@
 import FilledBtn from "@components/atom/filled-btn";
 import Textarea from "@components/atom/textarea";
 import Layout from "@components/template/layout";
+import useCoords from "@libs/client/useCoords";
 import useMutation from "@libs/client/useMutation";
 import { Post } from "@prisma/client";
 import { NextPage } from "next";
@@ -18,11 +19,12 @@ interface WriteResponse {
 }
 
 const Write: NextPage = () => {
+  const { latitude, longitude } = useCoords();
   const { register, handleSubmit } = useForm<WriteForm>();
   const [post, { loading, data }] = useMutation<WriteResponse>("/api/posts");
   const onValid = (data: WriteForm) => {
     if (loading) return;
-    post(data);
+    post({ ...data, latitude, longitude });
   };
 
   const router = useRouter();
