@@ -8,44 +8,39 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ) {
   const {
-    query: { id },
+    query: { productId },
     session: { user },
   } = req;
-
-  const alreadyExists = await client.interest.findFirst({
+  const alreadyExists = await client.fav.findFirst({
     where: {
+      productId: Number(productId),
       userId: user?.id,
-      postId: Number(id),
-    },
-    select: {
-      id: true,
     },
   });
-
   if (alreadyExists) {
-    await client.interest.delete({
+    await client.fav.delete({
       where: {
         id: alreadyExists.id,
       },
     });
+    return res.status(204).json({ success: true });
   } else {
-    await client.interest.create({
+    await client.fav.create({
       data: {
         user: {
           connect: {
             id: user?.id,
           },
         },
-        post: {
+        product: {
           connect: {
-            id: Number(id),
+            id: Number(productId),
           },
         },
       },
     });
+    return res.status(201).json({ success: true });
   }
-
-  res.json({ success: true });
 }
 
 export default withApiSession(

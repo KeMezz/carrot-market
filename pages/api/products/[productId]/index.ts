@@ -8,12 +8,13 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ) {
   const {
-    query: { id },
+    query: { productId },
     session: { user },
   } = req;
-  const post = await client.post.findUnique({
+  const cleanId = Number(productId);
+  const product = await client.product.findUnique({
     where: {
-      id: Number(id),
+      id: cleanId,
     },
     include: {
       user: {
@@ -23,33 +24,25 @@ async function handler(
           avatar: true,
         },
       },
-      answers: {
-        select: {
-          answer: true,
-          id: true,
-          createdAt: true,
-          user: {
-            select: {
-              id: true,
-              name: true,
-              avatar: true,
-            },
-          },
-        },
-      },
-      _count: {
-        select: {
-          answers: true,
-          interests: true,
+    },
+  });
+  const terms = product?.name
+    .split(" ")
+    .map((word) => ({ name: { contains: word } }));
+  const relatedProducts = await client.product.findMany({
+    where: {
+      OR: terms,
+      AND: {
+        id: {
+          not: cleanId,
         },
       },
     },
   });
-
-  const isInterest = Boolean(
-    await client.interest.findFirst({
+  const isLiked = Boolean(
+    await client.fav.findFirst({
       where: {
-        postId: Number(id),
+        productId: product?.id,
         userId: user?.id,
       },
       select: {
@@ -57,8 +50,7 @@ async function handler(
       },
     })
   );
-
-  res.json({ success: true, post, isInterest });
+  res.json({ success: true, product, relatedProducts, isLiked });
 }
 
 export default withApiSession(
