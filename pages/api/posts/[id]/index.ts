@@ -45,7 +45,20 @@ async function handler(
       },
     },
   });
-  res.json({ success: true, post });
+
+  const isInterest = Boolean(
+    await client.interest.findFirst({
+      where: {
+        postId: Number(id),
+        userId: user?.id,
+      },
+      select: {
+        id: true,
+      },
+    })
+  );
+
+  res.json({ success: true, post, isInterest });
 }
 
 export default withApiSession(

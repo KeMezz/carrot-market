@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 import useSWR from "swr";
 import { Answer, Post } from "@prisma/client";
 import { useForm } from "react-hook-form";
+import useMutation from "@libs/client/useMutation";
 
 interface UserEssential {
   id: number;
@@ -29,15 +30,44 @@ interface PostDetailResponse {
     }[];
     _count: { answers: number; interests: number };
   } & Post;
+  isInterest: boolean;
+}
+
+interface AnswerForm {
+  answer: string;
 }
 
 const CommunityDetail: NextPage = () => {
   const router = useRouter();
-  const { data, error } = useSWR<PostDetailResponse>(
+  const { data, mutate } = useSWR<PostDetailResponse>(
     router.query.id ? `/api/posts/${router.query.id}` : null
   );
-  console.log(data);
-  const { register, handleSubmit } = useForm();
+  const [interest] = useMutation(`/api/posts/${router.query.id}/interest`);
+  const onInterestClick = () => {
+    interest({});
+    mutate(
+      (prev) =>
+        prev && {
+          ...prev,
+          post: {
+            ...prev.post,
+            _count: {
+              ...prev.post._count,
+              interests: data?.isInterest
+                ? prev.post._count.interests - 1
+                : prev.post._count.interests + 1,
+            },
+          },
+          isInterest: !data?.isInterest,
+        },
+      false
+    );
+  };
+
+  const { register, handleSubmit } = useForm<AnswerForm>();
+  const onValid = (data: AnswerForm) => {
+    console.log(data);
+  };
 
   return (
     <Layout canGoBack>
@@ -53,6 +83,8 @@ const CommunityDetail: NextPage = () => {
         <CommunityQuestion question={data?.post.question} />
         <div className="flex gap-6 border-t border-b py-3">
           <ReactionBtn
+            isClicked={data?.isInterest}
+            onClick={onInterestClick}
             title="궁금해요"
             count={data?.post._count.interests!}
             d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
@@ -73,12 +105,14 @@ const CommunityDetail: NextPage = () => {
             </div>
           </div>
         ))}
-        <Textarea
-          id="answer"
-          register={register("answer", { required: true })}
-          placeholder="Answer the question!"
-        />
-        <FilledBtn title="Reply" />
+        <form onSubmit={handleSubmit(onValid)} className="flex flex-col gap-4">
+          <Textarea
+            id="answer"
+            register={register("answer", { required: true })}
+            placeholder="Answer the question!"
+          />
+          <FilledBtn title="Reply" />
+        </form>
       </section>
     </Layout>
   );
