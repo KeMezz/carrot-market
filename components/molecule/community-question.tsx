@@ -1,7 +1,7 @@
 import React from "react";
 
 interface CommunityQuestionProps {
-  question: string;
+  question?: string;
 }
 
 const CommunityQuestion = ({ question }: CommunityQuestionProps) => {
