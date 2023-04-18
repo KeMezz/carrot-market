@@ -1,11 +1,11 @@
 import type { NextPage } from "next";
-import { useRouter } from "next/router";
 import FloatingBtn from "@components/atom/floating-btn";
 import Layout from "@components/template/layout";
 import ProductCard from "@components/molecule/product-card";
 import useUser from "@libs/client/useUser";
 import useSWR from "swr";
 import { Product } from "@prisma/client";
+import Link from "next/link";
 
 interface ProductWithCounts extends Product {
   _count: {
@@ -19,8 +19,6 @@ interface ProductsResponse {
 }
 
 const Home: NextPage = () => {
-  const router = useRouter();
-  const goToUpload = () => router.push("/products/upload");
   const { user, isLoading } = useUser();
   const { data } = useSWR<ProductsResponse>("/api/products");
   return (
@@ -38,7 +36,9 @@ const Home: NextPage = () => {
           />
         ))}
       </div>
-      <FloatingBtn onClick={goToUpload} d="M12 4.5v15m7.5-7.5h-15" />
+      <Link href="/products/upload">
+        <FloatingBtn d="M12 4.5v15m7.5-7.5h-15" />
+      </Link>
     </Layout>
   );
 };

@@ -1,7 +1,7 @@
 import { NextPage } from "next";
 
 interface FloatingBtnProps {
-  onClick: React.MouseEventHandler<HTMLButtonElement>;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
   d: string;
 }
 
