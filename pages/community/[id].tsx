@@ -11,6 +11,7 @@ import useSWR from "swr";
 import { Answer, Post } from "@prisma/client";
 import { useForm } from "react-hook-form";
 import useMutation from "@libs/client/useMutation";
+import { useEffect } from "react";
 
 interface UserEssential {
   id: number;
@@ -37,14 +38,22 @@ interface AnswerForm {
   answer: string;
 }
 
+interface AnswerResponse {
+  success: boolean;
+  answer: Answer;
+}
+
 const CommunityDetail: NextPage = () => {
   const router = useRouter();
   const { data, mutate } = useSWR<PostDetailResponse>(
     router.query.id ? `/api/posts/${router.query.id}` : null
   );
-  const [interest] = useMutation(`/api/posts/${router.query.id}/interest`);
+
+  const [interest, { loading: interestLoading }] = useMutation(
+    `/api/posts/${router.query.id}/interest`
+  );
   const onInterestClick = () => {
-    interest({});
+    if (!data) return;
     mutate(
       (prev) =>
         prev && {
@@ -62,12 +71,25 @@ const CommunityDetail: NextPage = () => {
         },
       false
     );
+    if (!interestLoading) {
+      interest({});
+    }
   };
 
-  const { register, handleSubmit } = useForm<AnswerForm>();
+  const { register, handleSubmit, reset } = useForm<AnswerForm>();
+  const [sendAnswer, { data: answerData, loading: answerLoading }] =
+    useMutation<AnswerResponse>(`/api/posts/${router.query.id}/answer`);
+
   const onValid = (data: AnswerForm) => {
-    console.log(data);
+    if (answerLoading) return;
+    sendAnswer(data);
   };
+
+  useEffect(() => {
+    if (answerData && answerData.success) {
+      reset();
+    }
+  }, [answerData, reset]);
 
   return (
     <Layout canGoBack>
@@ -97,7 +119,7 @@ const CommunityDetail: NextPage = () => {
         </div>
         {data?.post.answers.map((answer) => (
           <div className="flex gap-4" key={answer.id}>
-            <div className="bg-gray-300 w-14 h-12 rounded-full" />
+            <div className="bg-gray-300 w-12 h-12 rounded-full" />
             <div className="flex flex-col gap-1 w-fit">
               <h3 className="text-sm">{answer.user.name}</h3>
               <p className="text-xs text-gray-400">{answer.createdAt}</p>
@@ -111,7 +133,7 @@ const CommunityDetail: NextPage = () => {
             register={register("answer", { required: true })}
             placeholder="Answer the question!"
           />
-          <FilledBtn title="Reply" />
+          <FilledBtn title={answerLoading ? "Loading..." : "Reply"} />
         </form>
       </section>
     </Layout>
