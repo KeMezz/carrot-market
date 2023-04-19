@@ -12,7 +12,7 @@ interface RecordWithProduct extends Record {
   product: ProductWithUser;
 }
 
-interface PurchaseResponse {
+interface RecordResponse {
   success: boolean;
   records: RecordWithProduct[];
 }
@@ -22,8 +22,8 @@ interface RecordProps {
   title: string;
 }
 
-const RecordWrapper: NextPage<RecordProps> = ({ recordKind, title }) => {
-  const { data } = useSWR<PurchaseResponse>(
+const ProductList: NextPage<RecordProps> = ({ recordKind, title }) => {
+  const { data } = useSWR<RecordResponse>(
     `/api/users/me/record?kind=${recordKind}`
   );
   return (
@@ -45,4 +45,4 @@ const RecordWrapper: NextPage<RecordProps> = ({ recordKind, title }) => {
   );
 };
 
-export default RecordWrapper;
+export default ProductList;

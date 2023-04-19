@@ -1,8 +1,8 @@
 import { NextPage } from "next";
-import RecordOrg from "@components/organism/record-organism";
+import ProductList from "@components/organism/product-list";
 
 const Sold: NextPage = () => {
-  return <RecordOrg title="판매내역" recordKind="sales" />;
+  return <ProductList title="판매내역" recordKind="sales" />;
 };
 
 export default Sold;
