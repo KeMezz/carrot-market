@@ -4,7 +4,7 @@ import Link from "next/link";
 interface ProfileProps {
   userId: number;
   name: string;
-  avatar?: string;
+  avatar?: string | null;
 }
 
 const Profile: NextPage<ProfileProps> = ({ userId, name, avatar }) => {

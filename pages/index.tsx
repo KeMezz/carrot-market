@@ -27,7 +27,7 @@ const Home: NextPage = () => {
   }
   return (
     <Layout title="홈">
-      <div className="divide-y">
+      <div className="flex flex-col divide-y">
         {data?.products.map((product) => (
           <ProductCard
             id={product.id}

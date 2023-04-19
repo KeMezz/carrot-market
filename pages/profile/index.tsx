@@ -3,13 +3,18 @@ import StarRating from "@components/atom/star-rating";
 import Profile from "@components/molecule/profile";
 import ProfileBtn from "@components/atom/profile-button";
 import Layout from "@components/template/layout";
+import useUser from "@libs/client/useUser";
 
 const MyKarrot: NextPage = () => {
+  const { user } = useUser();
+  if (!user) {
+    return null;
+  }
   return (
     <Layout title="나의 캐럿">
       <section>
         <div className="p-4">
-          <Profile />
+          <Profile name={user?.name} userId={user?.id} avatar={user?.avatar} />
         </div>
         <div className="flex justify-around p-4">
           <ProfileBtn
