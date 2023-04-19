@@ -26,6 +26,7 @@ const ProductList: NextPage<RecordProps> = ({ recordKind, title }) => {
   const { data } = useSWR<RecordResponse>(
     `/api/users/me/record?kind=${recordKind}`
   );
+  if (!data?.records) return null;
   return (
     <Layout title={title} canGoBack>
       <section className="flex flex-col divide-y">
