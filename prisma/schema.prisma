@@ -12,19 +12,24 @@ datasource db {
 }
 
 model User {
-  id        Int        @id @default(autoincrement())
-  phone     String?    @unique
-  email     String?    @unique
-  avatar    String?
-  name      String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  tokens    Token[]
-  products  Product[]
-  favs      Fav[]
-  posts     Post[]
-  answers   Answer[]
-  interests Interest[]
+  id              Int        @id @default(autoincrement())
+  phone           String?    @unique
+  email           String?    @unique
+  avatar          String?
+  name            String
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  tokens          Token[]
+  products        Product[]
+  posts           Post[]
+  answers         Answer[]
+  interests       Interest[]
+  writtenReviews  Review[]   @relation(name: "writtenReviews")
+  receivedReviews Review[]   @relation(name: "receivedReviews")
+  // favs            Fav[]
+  // sales           Sale[]
+  // purchases       Purchase[]
+  record          Record[]
 }
 
 model Token {
@@ -48,22 +53,12 @@ model Product {
   name        String
   price       Int
   description String   @db.MediumText
-  favs        Fav[]
+  record      Record[]
+  // favs        Fav[]
+  // sales       Sale[]
+  // purchases   Purchase[]
 
   @@index([userId])
-}
-
-model Fav {
-  id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId])
-  @@index([productId])
 }
 
 model Post {
@@ -106,4 +101,77 @@ model Interest {
 
   @@index([userId])
   @@index([postId])
+}
+
+model Review {
+  id           Int      @id @default(autoincrement())
+  review       String   @db.MediumText
+  createdBy    User     @relation(name: "writtenReviews", fields: [createdById], references: [id], onDelete: Cascade)
+  createdById  Int
+  createdFor   User     @relation(name: "receivedReviews", fields: [createdForId], references: [id], onDelete: Cascade)
+  createdForId Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([createdById])
+  @@index([createdForId])
+}
+
+// model Fav {
+//   id        Int      @id @default(autoincrement())
+//   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   userId    Int
+//   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+//   productId Int
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@index([userId])
+//   @@index([productId])
+// }
+
+// model Sale {
+//   id        Int      @id @default(autoincrement())
+//   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   userId    Int
+//   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+//   productId Int
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@index([userId])
+//   @@index([productId])
+// }
+
+// model Purchase {
+//   id        Int      @id @default(autoincrement())
+//   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   userId    Int
+//   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+//   productId Int
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@index([userId])
+//   @@index([productId])
+// }
+
+enum Kind {
+  Purchase
+  Sale
+  Fav
+}
+
+model Record {
+  kind      Kind
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([productId])
 }
