@@ -13,19 +13,32 @@ async function handler(
     session: { user },
   } = req;
 
-  console.log(kind);
-
   switch (kind) {
     case Kind.favs:
     case Kind.purchases:
     case Kind.sales:
-      const products = await client.record.findMany({
+      const records = await client.record.findMany({
+        include: {
+          product: {
+            include: {
+              _count: {
+                select: {
+                  records: {
+                    where: {
+                      kind: "favs",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
         where: {
-          id: user?.id,
+          userId: user?.id,
           kind,
         },
       });
-      res.json({ success: true, products });
+      res.json({ success: true, records });
       break;
     default:
       res.json({ success: false });
