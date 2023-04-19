@@ -1,7 +1,7 @@
 import React from "react";
 
 interface StarRatingProps {
-  rate: 1 | 2 | 3 | 4 | 5;
+  rate: number;
 }
 
 const EmptyStar = () => (
