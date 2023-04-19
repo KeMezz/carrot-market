@@ -9,7 +9,7 @@ import Link from "next/link";
 
 interface ProductWithCounts extends Product {
   _count: {
-    favs: number;
+    records: number;
   };
 }
 
@@ -19,10 +19,10 @@ interface ProductsResponse {
 }
 
 const Home: NextPage = () => {
-  const { user, isLoading } = useUser();
+  const { error } = useUser();
   const { data } = useSWR<ProductsResponse>("/api/products");
   console.log(data);
-  if (data && !data.success) {
+  if ((data && !data.success) || (data && error)) {
     return null;
   }
   return (
@@ -35,7 +35,7 @@ const Home: NextPage = () => {
             title={product.name}
             color="Black"
             price={product.price}
-            heart={product._count.favs}
+            heart={product._count.records}
             comment={0}
           />
         ))}
