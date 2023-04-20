@@ -1,32 +1,72 @@
 import ChatInput from "@components/molecule/chat-input";
-import LeftBubble from "@components/atom/left-bubble";
 import Layout from "@components/template/layout";
-import RightBubble from "@components/atom/right-bubble";
+import { useRouter } from "next/router";
+import useSWR from "swr";
+import { Stream } from "@prisma/client";
+import Bubble from "@components/atom/bubble";
+import { useForm } from "react-hook-form";
+import useMutation from "@libs/client/useMutation";
+import useUser from "@libs/client/useUser";
+
+interface StreamWithMessage extends Stream {
+  messages: {
+    message: string;
+    user: {
+      id: number;
+      avatar?: string;
+    };
+  }[];
+}
+
+interface StreamResponse {
+  success: boolean;
+  stream: StreamWithMessage;
+}
+
+interface StreamMessageForm {
+  message: string;
+}
 
 const StreamDetail = () => {
+  const { user } = useUser();
+  const router = useRouter();
+  const { data: streamData } = useSWR<StreamResponse>(
+    router.query.id ? `/api/streams/${router.query.id}` : null
+  );
+  const [sendMessage, { loading: sendMsgLoading, data: sendMsgData }] =
+    useMutation(`/api/streams/${router.query.id}/message`);
+  const { register, handleSubmit, reset } = useForm<StreamMessageForm>();
+  const onValid = (form: StreamMessageForm) => {
+    if (sendMsgLoading) return;
+    sendMessage(form);
+    reset();
+  };
+
   return (
     <Layout canGoBack>
       <section className="p-4">
-        <div className="mb-8">
+        <div className="flex flex-col gap-3 pb-4 mb-4">
           <div className="w-full bg-slate-300 rounded-md shadow-sm aspect-video" />
-          <h1 className="text-2xl font-semibold mt-4">Let us try potatos</h1>
+          <h1 className="text-2xl font-semibold mt-4">
+            {streamData?.stream?.name}
+          </h1>
+          <h3 className="text-lg font-medium">${streamData?.stream?.price}</h3>
+          <p>{streamData?.stream?.description}</p>
         </div>
-        <div className="flex flex-col gap-4 w-full overflow-y-scroll h-[50vh] py-2">
-          <LeftBubble message="How much are you selling them for?" />
-          <RightBubble message="I want ₩20,000." />
-          <LeftBubble message="How much are you selling them for?" />
-          <RightBubble message="I want ₩20,000." />
-          <LeftBubble message="How much are you selling them for?" />
-          <RightBubble message="I want ₩20,000." />
-          <LeftBubble message="How much are you selling them for?" />
-          <RightBubble message="I want ₩20,000." />
-          <LeftBubble message="How much are you selling them for?" />
-          <RightBubble message="I want ₩20,000." />
-          <LeftBubble message="How much are you selling them for?" />
-          <RightBubble message="I want ₩20,000." />
+        <div className="flex flex-col gap-4 w-full overflow-y-scroll h-[50vh] p-4 mb-16 border rounded-md">
+          <h2 className="text-xl font-semibold pb-4">Chats</h2>
+          {streamData?.stream.messages.map((message, index) => (
+            <Bubble
+              key={index}
+              message={message.message}
+              reversed={user?.id === message.user.id}
+            />
+          ))}
         </div>
       </section>
-      <ChatInput />
+      <form onSubmit={handleSubmit(onValid)}>
+        <ChatInput register={register("message")} />
+      </form>
     </Layout>
   );
 };
