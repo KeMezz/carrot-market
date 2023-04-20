@@ -17,6 +17,7 @@ async function handler(
     const profile = await client.user.findUnique({
       where: { id: req.session.user?.id },
     });
+    if (!profile) return res.status(404).json({ success: false });
     res.json({ success: true, profile });
   }
 

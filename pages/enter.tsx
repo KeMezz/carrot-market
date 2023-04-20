@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import useMutation from "@libs/client/useMutation";
 import { ResponseType } from "@libs/server/withHandler";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 type method = "email" | "phone";
 
@@ -53,9 +54,9 @@ const Enter: NextPage = () => {
 
   const router = useRouter();
   useEffect(() => {
-    console.log("TD", tokenData);
-    if (tokenData?.success) {
-      router.push("/?page=1");
+    if (tokenData && tokenData.success) {
+      console.log("TD", tokenData);
+      router.push("/?page=1").then(() => router.reload());
     }
   }, [tokenData, router]);
 
