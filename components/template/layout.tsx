@@ -18,7 +18,7 @@ function Layout({ title, canGoBack, children }: LayoutProps) {
         <title>{title}</title>
       </Head>
       <main>
-        <header className="h-14 border-b flex justify-between items-center font-semibold text-lg fixed top-0 w-full max-w-xl bg-white px-4">
+        <header className="h-14 border-b flex justify-between items-center font-semibold text-lg fixed top-0 w-full max-w-xl bg-white px-4 z-10">
           <div>
             {canGoBack ? (
               <button className="flex items-center" onClick={back}>
