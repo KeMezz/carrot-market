@@ -1,6 +1,8 @@
 import FilledBtn from "@components/atom/filled-btn";
 import TextInput from "@components/atom/text-input";
 import Layout from "@components/template/layout";
+import useImageId from "@libs/client/getImageId";
+import getImageId from "@libs/client/getImageId";
 import useMutation from "@libs/client/useMutation";
 import useUser from "@libs/client/useUser";
 import { ProfileErrorResponse } from "@pages/api/users/me";
@@ -46,12 +48,10 @@ const Edit = () => {
 
     // if user touches avatar input, we request the cloudflare upload url.
     if (avatar && avatar.length > 0 && user) {
-      const { uploadURL } = await (await fetch(`/api/files`)).json();
-      const form = new FormData();
-      form.append("file", avatar[0], user.id + "");
-      const {
-        result: { id: avatarId },
-      } = await (await fetch(uploadURL, { method: "POST", body: form })).json();
+      const avatarId = await getImageId({
+        fileList: avatar!,
+        fileName: user?.id + "",
+      });
       editProfile({
         email,
         phone,
@@ -76,10 +76,6 @@ const Edit = () => {
     }
   }, [user, setValue]);
 
-  // define user avatar variables
-  const avatar = watch("avatar");
-  const [avatarPreview, setAvatarPreview] = useState("");
-
   // if server responses with error object, we'll show error to users too.
   useEffect(() => {
     if (data && data?.error?.email) {
@@ -89,6 +85,13 @@ const Edit = () => {
       setError("phone", { message: data.error.phone });
     }
   }, [data, setError]);
+
+  // define user avatar variables
+  const avatar = watch("avatar");
+  const [avatarPreview, setAvatarPreview] = useState("");
+
+  // get image url and get upload mutate function
+  const [getImageId, { loading: uploadImageLoading }] = useImageId();
 
   // when user provides a new avatar image, we fake fills an avatar component with new image.
   useEffect(() => {
@@ -154,7 +157,11 @@ const Edit = () => {
               {errors.email.message}
             </p>
           ) : null}
-          <FilledBtn title={loading ? "Loading..." : "Update Profile"} />
+          <FilledBtn
+            title={
+              loading || uploadImageLoading ? "Loading..." : "Update Profile"
+            }
+          />
         </section>
       </form>
     </Layout>

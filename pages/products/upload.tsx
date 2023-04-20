@@ -4,14 +4,16 @@ import Textarea from "@components/atom/textarea";
 import TextInput from "@components/atom/text-input";
 import { useForm } from "react-hook-form";
 import useMutation from "@libs/client/useMutation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Product } from "@prisma/client";
+import useImageId from "@libs/client/getImageId";
 
 interface UploadProductForm {
   name: string;
   price: string;
   description: string;
+  image: FileList;
 }
 
 interface UploadProductMutation {
@@ -20,13 +22,34 @@ interface UploadProductMutation {
 }
 
 const Upload = () => {
-  const { register, handleSubmit } = useForm<UploadProductForm>();
-  const [uploadProduct, { loading, data }] =
+  const { register, handleSubmit, watch } = useForm<UploadProductForm>();
+  const [uploadProduct, { loading: formUploadLoading, data }] =
     useMutation<UploadProductMutation>("/api/products");
-  const onValid = (data: UploadProductForm) => {
+  const [getImageId, { loading: imageUploadLoading }] = useImageId();
+  const loading = formUploadLoading || imageUploadLoading;
+
+  const onValid = async ({
+    name,
+    price,
+    description,
+    image,
+  }: UploadProductForm) => {
     if (loading) return;
-    uploadProduct(data);
+    if (image && image.length > 0) {
+      const imageId = await getImageId({ fileList: image, fileName: name });
+      console.log(imageId);
+      return uploadProduct({ name, price, description, image: imageId });
+    }
+    return uploadProduct({ name, price, description });
   };
+
+  const watchImage = watch("image");
+  const [previewImage, setPreviewImage] = useState("");
+  useEffect(() => {
+    if (watchImage && watchImage.length > 0) {
+      setPreviewImage(URL.createObjectURL(watchImage[0]));
+    }
+  }, [watchImage]);
 
   const router = useRouter();
   useEffect(() => {
@@ -38,25 +61,35 @@ const Upload = () => {
   return (
     <Layout canGoBack>
       <form className="p-4 space-y-4" onSubmit={handleSubmit(onValid)}>
-        <label htmlFor="file">
-          <div className="my-12 h-56 border-dashed w-full border-2 border-slate-300 rounded-md flex justify-center items-center cursor-pointer hover:border-slate-700">
-            <svg
-              className="h-12 w-12"
-              stroke="currentColor"
-              fill="none"
-              viewBox="0 0 48 48"
-              aria-hidden="true"
-            >
-              <path
-                d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
+        <label htmlFor="file" className="cursor-pointer">
+          {previewImage ? (
+            <img className="w-full rounded-md mx-auto" src={previewImage} />
+          ) : (
+            <div className="my-12 h-56 border-dashed w-full border-2 border-slate-300 rounded-md flex justify-center items-center hover:border-orange-400 hover:text-orange-400 hover:bg-orange-100">
+              <svg
+                className="h-12 w-12"
+                stroke="currentColor"
+                fill="none"
+                viewBox="0 0 48 48"
+                aria-hidden="true"
+              >
+                <path
+                  d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+          )}
         </label>
-        <input type="file" className="hidden" id="file" />
+        <input
+          type="file"
+          className="hidden"
+          id="file"
+          accept="image/*"
+          {...register("image", { required: true })}
+        />
         <section className="space-y-4">
           <TextInput
             name="상품명"

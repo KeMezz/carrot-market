@@ -16,7 +16,7 @@ interface ProductDetailResponse {
     user: {
       id: number;
       name: string;
-      avatar: string;
+      avatar: string | null;
     };
   } & Product;
   isLiked: boolean;
@@ -27,21 +27,31 @@ const ItemDetail: NextPage = () => {
   const { data, mutate: boundMutate } = useSWR<ProductDetailResponse>(
     router.query.id ? `/api/products/${router.query.id}` : null
   );
-  // const { mutate: refetch } = useSWRConfig();
   const [toggleFav] = useMutation(`/api/products/${router.query.id}/fav`);
   const onFavClick = () => {
     toggleFav({});
     if (!data) return;
     boundMutate((prev) => prev && { ...prev, isLiked: !data.isLiked }, false);
-    // refetch("/api/users/me");
   };
-  console.log(data?.isLiked);
+
   return (
     <Layout canGoBack title={data?.product.name}>
       <section className="p-4">
         <div className="border-b">
-          <div className="w-full h-96 bg-slate-300 rounded-md" />
+          {data?.product.image ? (
+            <img
+              src={
+                data
+                  ? `https://imagedelivery.net/bNh-NL16qgpnc_aca1vxPw/${data?.product.image}/public`
+                  : ""
+              }
+              className="w-full bg-slate-300 rounded-md mx-auto"
+            />
+          ) : (
+            <div className="w-full h-96 bg-slate-300 rounded-md" />
+          )}
           <Profile
+            avatar={data?.product.user.avatar ?? null}
             userId={data?.product.userId!}
             name={data?.product.user.name!}
           />
@@ -100,6 +110,7 @@ const ItemDetail: NextPage = () => {
                   productId={product.id}
                   title={product.name}
                   price={product.price}
+                  image={product.image}
                 />
               ))}
             </div>

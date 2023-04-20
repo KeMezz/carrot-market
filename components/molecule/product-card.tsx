@@ -8,6 +8,7 @@ interface ProductProps {
   price: number;
   heart: number;
   comment: number;
+  image?: string;
 }
 
 const ProductCard = ({
@@ -17,11 +18,19 @@ const ProductCard = ({
   price,
   heart,
   comment,
+  image,
 }: ProductProps) => {
   return (
     <Link href={`/products/${id}`}>
       <article className="flex p-4 gap-4">
-        <div className="bg-slate-400 rounded-lg w-24 h-24" />
+        {image ? (
+          <img
+            className="bg-slate-400 rounded-lg w-24 h-24"
+            src={`https://imagedelivery.net/bNh-NL16qgpnc_aca1vxPw/${image}/avatar`}
+          />
+        ) : (
+          <div className="bg-slate-400 rounded-lg w-24 h-24" />
+        )}
         <section className="flex flex-col justify-center">
           <h3 className="font-bold">{title}</h3>
           <p className="text-xs text-slate-500">{color}</p>

@@ -25,9 +25,10 @@ async function handler(
     if (!products) return res.status(404).json({ success: false });
     else return res.json({ success: true, products, totalCount });
   }
+
   if (req.method === "POST") {
     const {
-      body: { name, price, description },
+      body: { name, price, description, image },
       session: { user },
     } = req;
     const product = await client.product.create({
@@ -35,7 +36,7 @@ async function handler(
         name,
         price: +price,
         description,
-        image: "",
+        image: image ?? "",
         user: { connect: { id: user?.id } },
       },
     });
