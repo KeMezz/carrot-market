@@ -38,7 +38,7 @@ const Pagination: NextPage<PaginationProps> = ({ page = 1, totalCount }) => {
   const firstDisabled = Number(router.query.page) === 1;
   const lastDisabled = Number(router.query.page) === totalCount;
 
-  return (
+  return totalCount ? (
     <div className="flex gap-6 justify-center py-6 mb-16">
       <button
         onClick={goFirstPage}
@@ -96,7 +96,7 @@ const Pagination: NextPage<PaginationProps> = ({ page = 1, totalCount }) => {
         </svg>
       </button>
     </div>
-  );
+  ) : null;
 };
 
 export default Pagination;
