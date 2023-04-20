@@ -14,7 +14,7 @@ async function handler(
   } = req;
 
   if (req.method === "GET") {
-    const totalCount = await client.stream.count();
+    const totalCount = Math.ceil((await client.stream.count()) / 10);
     const streams = await client.stream.findMany({
       take: 10,
       skip: (Number(page) - 1) * 10,

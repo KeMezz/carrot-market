@@ -10,10 +10,18 @@ interface PaginationProps {
 
 const Pagination: NextPage<PaginationProps> = ({ page = 1, totalCount }) => {
   const router = useRouter();
-  const maxPage = Math.ceil(totalCount / 10);
-  const pages = Array.from({ length: 9 }, (_, i) => {
-    if (page + 4 > maxPage) {
-      return maxPage - 8 + i;
+  const length = () => {
+    if (totalCount < 9) {
+      return totalCount;
+    } else {
+      return 9;
+    }
+  };
+  const pages = Array.from({ length: length() }, (_, i) => {
+    if (totalCount < 9) {
+      return i + 1;
+    } else if (page + 4 > totalCount) {
+      return totalCount - 8 + i;
     } else if (page > 5) {
       return i + page - 4;
     } else {
@@ -22,13 +30,13 @@ const Pagination: NextPage<PaginationProps> = ({ page = 1, totalCount }) => {
   });
 
   const goFirstPage = () => router.replace({ query: { page: 1 } });
-  const goLastPage = () => router.replace({ query: { page: maxPage } });
+  const goLastPage = () => router.replace({ query: { page: totalCount } });
   const changePage = (number: number) => {
     if (number === page) return;
     router.replace({ query: { page: number } });
   };
   const firstDisabled = Number(router.query.page) === 1;
-  const lastDisabled = Number(router.query.page) === maxPage;
+  const lastDisabled = Number(router.query.page) === totalCount;
 
   return (
     <div className="flex gap-6 justify-center py-6 mb-16">
