@@ -44,13 +44,26 @@ const Edit = () => {
   const avatar = watch("avatar");
   const [avatarPreview, setAvatarPreview] = useState("");
 
-  const onValid = ({ email, phone, name, avatar }: EditProfileForm) => {
-    console.log(avatar);
-    return;
+  const onValid = async ({ email, phone, name, avatar }: EditProfileForm) => {
     if (loading) return;
     if (email === "" && phone === "" && name === "") {
       setError("root", {
         message: "이메일 혹은 휴대폰 번호 중 하나 이상은 반드시 입력해주세요.",
+      });
+    }
+    // if user touches avatar input
+    if (avatar && avatar.length > 0 && user) {
+      const { uploadURL } = await (await fetch(`/api/files`)).json();
+      const form = new FormData();
+      form.append("file", avatar[0], user.id + "");
+      const {
+        result: { id: avatarId },
+      } = await (await fetch(uploadURL, { method: "POST", body: form })).json();
+      editProfile({
+        email,
+        phone,
+        name,
+        avatarId,
       });
     }
     editProfile({ email, phone, name });
