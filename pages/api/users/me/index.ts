@@ -46,7 +46,7 @@ async function handler(
       phone: null,
     };
 
-    if (email) {
+    if (email || email === "") {
       const alreadyExists = Boolean(
         await client.user.findUnique({
           where: {
@@ -71,7 +71,7 @@ async function handler(
       }
     }
 
-    if (phone) {
+    if (phone || phone === "") {
       const alreadyExists = Boolean(
         await client.user.findUnique({
           where: {
