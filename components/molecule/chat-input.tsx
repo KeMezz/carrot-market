@@ -1,9 +1,15 @@
 import { NextPage } from "next";
+import { UseFormRegisterReturn } from "react-hook-form";
 
-const ChatInput: NextPage = () => {
+interface ChatInputProps {
+  register: UseFormRegisterReturn;
+}
+
+const ChatInput: NextPage<ChatInputProps> = ({ register }) => {
   return (
     <div className="fixed bottom-0 p-4 w-full flex items-center">
       <input
+        {...register}
         type="text"
         className="w-full rounded-full border-gray-400 focus:outline-none focus:ring-orange-400 focus:border-orange-400"
       />
