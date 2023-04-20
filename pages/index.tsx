@@ -6,6 +6,8 @@ import useUser from "@libs/client/useUser";
 import useSWR from "swr";
 import { Product } from "@prisma/client";
 import Link from "next/link";
+import Pagination from "@components/molecule/pagination";
+import { useRouter } from "next/router";
 
 interface ProductWithCounts extends Product {
   _count: {
@@ -16,12 +18,13 @@ interface ProductWithCounts extends Product {
 interface ProductsResponse {
   success: boolean;
   products: ProductWithCounts[];
+  totalCount: number;
 }
 
 const Home: NextPage = () => {
+  const router = useRouter();
   const { error } = useUser();
   const { data } = useSWR<ProductsResponse>("/api/products");
-  console.log(data);
   if ((data && !data.success) || (data && error)) {
     return null;
   }
@@ -40,6 +43,10 @@ const Home: NextPage = () => {
           />
         ))}
       </div>
+      <Pagination
+        page={Number(router.query.page)}
+        totalCount={data?.totalCount!}
+      />
       <Link href="/products/upload">
         <FloatingBtn d="M12 4.5v15m7.5-7.5h-15" />
       </Link>

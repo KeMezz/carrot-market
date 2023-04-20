@@ -55,7 +55,7 @@ const Enter: NextPage = () => {
   useEffect(() => {
     console.log("TD", tokenData);
     if (tokenData?.success) {
-      router.push("/");
+      router.push("/?page=1");
     }
   }, [tokenData, router]);
 

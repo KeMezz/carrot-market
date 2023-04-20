@@ -8,6 +8,7 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ) {
   if (req.method === "GET") {
+    const totalCount = Math.ceil((await client.product.count()) / 10);
     const products = await client.product.findMany({
       include: {
         _count: {
@@ -22,7 +23,7 @@ async function handler(
       },
     });
     if (!products) return res.status(404).json({ success: false });
-    else return res.json({ success: true, products });
+    else return res.json({ success: true, products, totalCount });
   }
   if (req.method === "POST") {
     const {
