@@ -15,7 +15,7 @@ async function handler(
       id: Number(streamId),
     },
     include: {
-      messages: {
+      streamMessages: {
         select: {
           message: true,
           user: {

@@ -7,10 +7,9 @@ import Bubble from "@components/atom/bubble";
 import { useForm } from "react-hook-form";
 import useMutation from "@libs/client/useMutation";
 import useUser from "@libs/client/useUser";
-import { useEffect } from "react";
 
 interface StreamWithMessage extends Stream {
-  messages: {
+  streamMessages: {
     message: string;
     user: {
       id: number;
@@ -34,11 +33,12 @@ const StreamDetail = () => {
   const { data: streamData, mutate } = useSWR<StreamResponse>(
     router.query.id ? `/api/streams/${router.query.id}` : null,
     {
-      // refreshInterval: 1000,
+      refreshInterval: 1000,
     }
   );
-  const [sendMessage, { loading: sendMsgLoading, data: sendMsgData }] =
-    useMutation(`/api/streams/${router.query.id}/message`);
+  const [sendMessage, { loading: sendMsgLoading }] = useMutation(
+    `/api/streams/${router.query.id}/message`
+  );
   const { register, handleSubmit, reset } = useForm<StreamMessageForm>();
   const onValid = (form: StreamMessageForm) => {
     if (sendMsgLoading) return;
@@ -50,7 +50,7 @@ const StreamDetail = () => {
           stream: {
             ...prev.stream,
             messages: [
-              ...prev.stream.messages,
+              ...prev.stream.streamMessages,
               {
                 message: form.message,
                 user: { id: user!.id, avatar: user?.avatar },
@@ -76,7 +76,7 @@ const StreamDetail = () => {
         </div>
         <div className="flex flex-col gap-4 w-full overflow-y-scroll h-[50vh] p-4 mb-16 border rounded-md">
           <h2 className="text-xl font-semibold pb-4">Chats</h2>
-          {streamData?.stream.messages.map((message, index) => (
+          {streamData?.stream.streamMessages.map((message, index) => (
             <Bubble
               key={index}
               message={message.message}

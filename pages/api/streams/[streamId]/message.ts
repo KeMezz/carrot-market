@@ -14,7 +14,7 @@ async function handler(
   } = req;
 
   if (req.method === "POST") {
-    const createdMessage = await client.message.create({
+    const createdMessage = await client.streamMessage.create({
       data: {
         message,
         stream: {
