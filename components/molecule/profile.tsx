@@ -4,7 +4,7 @@ import Link from "next/link";
 interface ProfileProps {
   userId: number;
   name: string;
-  avatar?: string | null;
+  avatar: string | null;
   editable?: boolean;
 }
 
@@ -14,9 +14,17 @@ const Profile: NextPage<ProfileProps> = ({
   avatar,
   editable,
 }) => {
+  console.log(avatar);
   return (
     <section className="flex items-center gap-6 py-4">
-      <div className="w-20 h-20 rounded-full bg-slate-300" />
+      {avatar ? (
+        <img
+          className="w-20 h-20 rounded-full bg-slate-300"
+          src={`https://imagedelivery.net/bNh-NL16qgpnc_aca1vxPw/${avatar}/public`}
+        />
+      ) : (
+        <div className="w-20 h-20 rounded-full bg-slate-300" />
+      )}
       <div className="flex flex-col items-start">
         <p className="text-lg font-semibold">{name}</p>
         {editable ? (

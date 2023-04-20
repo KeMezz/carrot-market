@@ -35,7 +35,7 @@ const MyKarrot: NextPage = () => {
           <Profile
             name={user?.name}
             userId={user?.id}
-            avatar={user?.avatar}
+            avatar={user.avatar}
             editable
           />
         </div>
