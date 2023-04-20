@@ -20,7 +20,12 @@ interface EditProfileResponse {
 }
 
 const Edit = () => {
+  // define APIs
   const { user, isLoading: userLoading } = useUser();
+  const [editProfile, { loading, data }] =
+    useMutation<EditProfileResponse>(`/api/users/me`);
+
+  // configure edit profile forms
   const {
     register,
     handleSubmit,
@@ -29,29 +34,17 @@ const Edit = () => {
     setError,
     watch,
   } = useForm<EditProfileForm>();
-
-  const [editProfile, { loading, data }] =
-    useMutation<EditProfileResponse>(`/api/users/me`);
-
-  useEffect(() => {
-    if (user) {
-      setValue("name", user.name ?? "");
-      setValue("email", user.email ?? "");
-      setValue("phone", user.phone ?? "");
-    }
-  }, [user, setValue]);
-
-  const avatar = watch("avatar");
-  const [avatarPreview, setAvatarPreview] = useState("");
-
   const onValid = async ({ email, phone, name, avatar }: EditProfileForm) => {
     if (loading) return;
+
+    // block submit when the form is completely empty
     if (email === "" && phone === "" && name === "") {
       setError("root", {
         message: "이메일 혹은 휴대폰 번호 중 하나 이상은 반드시 입력해주세요.",
       });
     }
-    // if user touches avatar input
+
+    // if user touches avatar input, we request the cloudflare upload url.
     if (avatar && avatar.length > 0 && user) {
       const { uploadURL } = await (await fetch(`/api/files`)).json();
       const form = new FormData();
@@ -66,9 +59,28 @@ const Edit = () => {
         avatarId,
       });
     }
+
+    // when avatar image is not provided, we just send it without image.
     editProfile({ email, phone, name });
   };
 
+  // fills form initially, with previous user profile data
+  useEffect(() => {
+    if (user) {
+      setValue("name", user.name ?? "");
+      setValue("email", user.email ?? "");
+      setValue("phone", user.phone ?? "");
+      setAvatarPreview(
+        `https://imagedelivery.net/bNh-NL16qgpnc_aca1vxPw/${user.avatar}/avatar`
+      );
+    }
+  }, [user, setValue]);
+
+  // define user avatar variables
+  const avatar = watch("avatar");
+  const [avatarPreview, setAvatarPreview] = useState("");
+
+  // if server responses with error object, we'll show error to users too.
   useEffect(() => {
     if (data && data?.error?.email) {
       setError("email", { message: data.error.email });
@@ -78,6 +90,7 @@ const Edit = () => {
     }
   }, [data, setError]);
 
+  // when user provides a new avatar image, we fake fills an avatar component with new image.
   useEffect(() => {
     if (avatar && avatar.length > 0) {
       const file = avatar[0];
