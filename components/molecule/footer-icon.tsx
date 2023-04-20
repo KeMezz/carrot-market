@@ -12,13 +12,13 @@ interface FooterIconProps {
 
 const FooterIcon: NextPage<FooterIconProps> = ({ d, name, href }) => {
   const [active, setActive] = useState(false);
-  const { route } = useRouter();
+  const router = useRouter();
 
   useEffect(() => {
-    if (route.split("/")[1] === href) {
+    if (router.pathname.split("/")[1] === href.split("?")[0]) {
       setActive(true);
     }
-  }, [href, route]);
+  }, [href, router]);
 
   return (
     <Link href={`/${href}`}>
