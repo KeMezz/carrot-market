@@ -32,7 +32,12 @@ const MyKarrot: NextPage = () => {
     <Layout title="나의 캐럿">
       <section>
         <div className="p-4">
-          <Profile name={user?.name} userId={user?.id} avatar={user?.avatar} />
+          <Profile
+            name={user?.name}
+            userId={user?.id}
+            avatar={user?.avatar}
+            editable
+          />
         </div>
         <div className="flex justify-around p-4">
           <Link href="/profile/sold">

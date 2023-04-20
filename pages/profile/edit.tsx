@@ -4,13 +4,14 @@ import Layout from "@components/template/layout";
 import useMutation from "@libs/client/useMutation";
 import useUser from "@libs/client/useUser";
 import { ProfileErrorResponse } from "@pages/api/users/me";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 interface EditProfileForm {
   email?: string;
   phone?: string;
   name?: string;
+  avatar?: FileList;
 }
 
 interface EditProfileResponse {
@@ -26,6 +27,7 @@ const Edit = () => {
     setValue,
     formState: { errors },
     setError,
+    watch,
   } = useForm<EditProfileForm>();
 
   const [editProfile, { loading, data }] =
@@ -39,7 +41,12 @@ const Edit = () => {
     }
   }, [user, setValue]);
 
-  const onValid = ({ email, phone, name }: EditProfileForm) => {
+  const avatar = watch("avatar");
+  const [avatarPreview, setAvatarPreview] = useState("");
+
+  const onValid = ({ email, phone, name, avatar }: EditProfileForm) => {
+    console.log(avatar);
+    return;
     if (loading) return;
     if (email === "" && phone === "" && name === "") {
       setError("root", {
@@ -58,46 +65,71 @@ const Edit = () => {
     }
   }, [data, setError]);
 
+  useEffect(() => {
+    if (avatar && avatar.length > 0) {
+      const file = avatar[0];
+      setAvatarPreview(URL.createObjectURL(file));
+    }
+  }, [avatar]);
+
   if (userLoading) return null;
   return (
     <Layout title="프로필 수정하기" canGoBack>
-      <div className="flex p-4 my-4 gap-4 items-center">
-        <div className="w-16 h-16 bg-gray-400 rounded-full" />
-        <button className="border py-2 px-4 rounded-lg">Change</button>
-      </div>
-      <form
-        className="flex flex-col gap-4 px-4"
-        onSubmit={handleSubmit(onValid)}
-      >
-        <TextInput
-          id="name"
-          name="Name"
-          register={register("name")}
-          type="text"
-        />
-        <TextInput
-          id="email"
-          name="Email Address"
-          register={register("email")}
-          type="text"
-        />
-        <TextInput
-          id="phone"
-          name="Phone Number"
-          register={register("phone")}
-          type="number"
-        />
-        {errors.phone ? (
-          <p className="text-center text-red-500 text-sm font-bold">
-            {errors.phone.message}
-          </p>
-        ) : null}
-        {errors.email ? (
-          <p className="text-center text-red-500 text-sm font-bold">
-            {errors.email.message}
-          </p>
-        ) : null}
-        <FilledBtn title={loading ? "Loading..." : "Update Profile"} />
+      <form onSubmit={handleSubmit(onValid)}>
+        <div className="flex p-4 my-4 gap-4 items-center">
+          {avatarPreview ? (
+            <img
+              src={avatarPreview}
+              className="w-16 h-16 bg-gray-400 rounded-full"
+            />
+          ) : (
+            <div className="w-16 h-16 bg-gray-400 rounded-full" />
+          )}
+          <label
+            htmlFor="avatar"
+            className="border py-2 px-4 rounded-lg cursor-pointer"
+          >
+            Change
+          </label>
+          <input
+            {...register("avatar")}
+            id="avatar"
+            type="file"
+            className="hidden"
+            accept="image/*"
+          />
+        </div>
+        <section className="flex flex-col gap-4 px-4">
+          <TextInput
+            id="name"
+            name="Name"
+            register={register("name")}
+            type="text"
+          />
+          <TextInput
+            id="email"
+            name="Email Address"
+            register={register("email")}
+            type="text"
+          />
+          <TextInput
+            id="phone"
+            name="Phone Number"
+            register={register("phone")}
+            type="number"
+          />
+          {errors.phone ? (
+            <p className="text-center text-red-500 text-sm font-bold">
+              {errors.phone.message}
+            </p>
+          ) : null}
+          {errors.email ? (
+            <p className="text-center text-red-500 text-sm font-bold">
+              {errors.email.message}
+            </p>
+          ) : null}
+          <FilledBtn title={loading ? "Loading..." : "Update Profile"} />
+        </section>
       </form>
     </Layout>
   );

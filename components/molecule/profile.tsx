@@ -5,20 +5,31 @@ interface ProfileProps {
   userId: number;
   name: string;
   avatar?: string | null;
+  editable?: boolean;
 }
 
-const Profile: NextPage<ProfileProps> = ({ userId, name, avatar }) => {
+const Profile: NextPage<ProfileProps> = ({
+  userId,
+  name,
+  avatar,
+  editable,
+}) => {
   return (
-    <Link
-      href={`/users/profiles/${userId}`}
-      className="flex items-center gap-4 py-4"
-    >
-      <div className="w-14 h-14 rounded-full bg-slate-300" />
-      <div>
-        <p className="font-semibold">{name}</p>
-        <button className="text-sm cursor-pointer">View Profile →</button>
+    <section className="flex items-center gap-6 py-4">
+      <div className="w-20 h-20 rounded-full bg-slate-300" />
+      <div className="flex flex-col items-start">
+        <p className="text-lg font-semibold">{name}</p>
+        {editable ? (
+          <Link href="/profile/edit">
+            <button className="text-xs hover:underline">Edit Profile →</button>
+          </Link>
+        ) : (
+          <Link href={`/users/profiles/${userId}`}>
+            <button className="text-xs hover:underline">View Profile →</button>
+          </Link>
+        )}
       </div>
-    </Link>
+    </section>
   );
 };
 
