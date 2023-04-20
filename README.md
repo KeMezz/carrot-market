@@ -12,15 +12,19 @@
   <img alt="edit profile" src="./screenshots/edit-profile.png" width="200" />
 </div>
 
-## 🥕 Introductions
+## 🥕 Introductions (in development 👨‍🔧)
 
 Karrot Market (the most popular buy and sell platform in Korea) clone project, based on web technologies.
 
 ## 🔧 Stacks
 
+- TypeScript
 - Next.js
+- SWR
+- Iron Session
 - Tailwind CSS
 - Prisma
+- PlanetScale
 
 ## 🚀 Deploy
 
