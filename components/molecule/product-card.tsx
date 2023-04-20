@@ -1,3 +1,4 @@
+import Image from "next/image";
 import ProductIcon from "../atom/product-icon";
 import Link from "next/link";
 
@@ -24,8 +25,12 @@ const ProductCard = ({
     <Link href={`/products/${id}`}>
       <article className="flex p-4 gap-4">
         {image ? (
-          <img
-            className="bg-slate-400 rounded-lg w-24 h-24"
+          <Image
+            alt={title}
+            width={96}
+            height={96}
+            priority
+            className="bg-slate-400 rounded-lg"
             src={`https://imagedelivery.net/bNh-NL16qgpnc_aca1vxPw/${image}/avatar`}
           />
         ) : (

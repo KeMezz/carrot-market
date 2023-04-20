@@ -1,11 +1,11 @@
 import FilledBtn from "@components/atom/filled-btn";
 import TextInput from "@components/atom/text-input";
 import Layout from "@components/template/layout";
-import useImageId from "@libs/client/getImageId";
-import getImageId from "@libs/client/getImageId";
+import useImageId from "@libs/client/useImageId";
 import useMutation from "@libs/client/useMutation";
 import useUser from "@libs/client/useUser";
 import { ProfileErrorResponse } from "@pages/api/users/me";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -101,16 +101,21 @@ const Edit = () => {
     }
   }, [avatar]);
 
-  if (userLoading) return null;
   return (
     <Layout title="프로필 수정하기" canGoBack>
       <form onSubmit={handleSubmit(onValid)}>
         <div className="flex p-4 my-4 gap-4 items-center">
           {avatarPreview ? (
-            <img
-              src={avatarPreview}
-              className="w-16 h-16 bg-gray-400 rounded-full"
-            />
+            <div>
+              <Image
+                alt={user!.name}
+                src={avatarPreview}
+                width={64}
+                height={64}
+                priority
+                className="bg-gray-400 rounded-full"
+              />
+            </div>
           ) : (
             <div className="w-16 h-16 bg-gray-400 rounded-full" />
           )}

@@ -8,6 +8,7 @@ import useSWR from "swr";
 import { Product } from "@prisma/client";
 import useMutation from "@libs/client/useMutation";
 import { cls } from "@libs/client/utils";
+import Image from "next/image";
 
 interface ProductDetailResponse {
   success: boolean;
@@ -39,14 +40,19 @@ const ItemDetail: NextPage = () => {
       <section className="p-4">
         <div className="border-b">
           {data?.product.image ? (
-            <img
-              src={
-                data
-                  ? `https://imagedelivery.net/bNh-NL16qgpnc_aca1vxPw/${data?.product.image}/public`
-                  : ""
-              }
-              className="w-full bg-slate-300 rounded-md mx-auto"
-            />
+            <div className="relative h-96">
+              <Image
+                alt={data.product.name}
+                fill
+                priority
+                src={
+                  data
+                    ? `https://imagedelivery.net/bNh-NL16qgpnc_aca1vxPw/${data.product.image}/public`
+                    : ""
+                }
+                className="w-full hover:bg-slate-100 transition-colors rounded-md mx-auto object-cover"
+              />
+            </div>
           ) : (
             <div className="w-full h-96 bg-slate-300 rounded-md" />
           )}

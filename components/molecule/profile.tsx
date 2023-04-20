@@ -1,4 +1,5 @@
 import { NextPage } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 interface ProfileProps {
@@ -14,13 +15,16 @@ const Profile: NextPage<ProfileProps> = ({
   avatar,
   editable,
 }) => {
-  console.log(avatar);
   return (
     <section className="flex items-center gap-6 py-4">
       {avatar ? (
-        <img
-          className="w-20 h-20 rounded-full bg-slate-300"
+        <Image
+          width={80}
+          height={80}
+          priority
+          className="rounded-full bg-slate-300"
           src={`https://imagedelivery.net/bNh-NL16qgpnc_aca1vxPw/${avatar}/avatar`}
+          alt={name}
         />
       ) : (
         <div className="w-20 h-20 rounded-full bg-slate-300" />

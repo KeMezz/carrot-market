@@ -1,4 +1,5 @@
 import { NextPage } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 interface GridProductProps {
@@ -18,8 +19,12 @@ const GridProduct: NextPage<GridProductProps> = ({
     <Link href={`/products/${productId}`}>
       <div>
         {image ? (
-          <img
-            className="w-full h-56 bg-slate-300 mb-3 rounded-lg"
+          <Image
+            alt={title}
+            width={224}
+            height={224}
+            priority
+            className="bg-slate-300 mb-3 rounded-lg"
             src={`https://imagedelivery.net/bNh-NL16qgpnc_aca1vxPw/${image}/avatar`}
           />
         ) : (
