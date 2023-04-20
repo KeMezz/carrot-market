@@ -20,7 +20,7 @@ const Profile: NextPage<ProfileProps> = ({
       {avatar ? (
         <img
           className="w-20 h-20 rounded-full bg-slate-300"
-          src={`https://imagedelivery.net/bNh-NL16qgpnc_aca1vxPw/${avatar}/public`}
+          src={`https://imagedelivery.net/bNh-NL16qgpnc_aca1vxPw/${avatar}/avatar`}
         />
       ) : (
         <div className="w-20 h-20 rounded-full bg-slate-300" />
