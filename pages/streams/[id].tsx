@@ -7,13 +7,14 @@ import Bubble from "@components/atom/bubble";
 import { useForm } from "react-hook-form";
 import useMutation from "@libs/client/useMutation";
 import useUser from "@libs/client/useUser";
+import { useEffect } from "react";
 
 interface StreamWithMessage extends Stream {
   messages: {
     message: string;
     user: {
       id: number;
-      avatar?: string;
+      avatar?: string | null;
     };
   }[];
 }
@@ -30,16 +31,36 @@ interface StreamMessageForm {
 const StreamDetail = () => {
   const { user } = useUser();
   const router = useRouter();
-  const { data: streamData } = useSWR<StreamResponse>(
-    router.query.id ? `/api/streams/${router.query.id}` : null
+  const { data: streamData, mutate } = useSWR<StreamResponse>(
+    router.query.id ? `/api/streams/${router.query.id}` : null,
+    {
+      // refreshInterval: 1000,
+    }
   );
   const [sendMessage, { loading: sendMsgLoading, data: sendMsgData }] =
     useMutation(`/api/streams/${router.query.id}/message`);
   const { register, handleSubmit, reset } = useForm<StreamMessageForm>();
   const onValid = (form: StreamMessageForm) => {
     if (sendMsgLoading) return;
-    sendMessage(form);
     reset();
+    mutate(
+      (prev) =>
+        prev && {
+          ...prev,
+          stream: {
+            ...prev.stream,
+            messages: [
+              ...prev.stream.messages,
+              {
+                message: form.message,
+                user: { id: user!.id, avatar: user?.avatar },
+              },
+            ],
+          },
+        },
+      false
+    );
+    sendMessage(form);
   };
 
   return (
