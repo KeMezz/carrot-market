@@ -64,11 +64,14 @@ const Upload = () => {
       <form className="p-4 space-y-4" onSubmit={handleSubmit(onValid)}>
         <label htmlFor="file" className="cursor-pointer">
           {previewImage ? (
-            <Image
-              alt={data?.product.name!}
-              className="w-full rounded-md mx-auto"
-              src={previewImage}
-            />
+            <div className="relative h-80 hover:bg-gray-100 transition-colors rounded-lg">
+              <Image
+                alt="미리보기 이미지"
+                fill
+                className="w-full rounded-md mx-auto object-contain"
+                src={previewImage}
+              />
+            </div>
           ) : (
             <div className="my-12 h-56 border-dashed w-full border-2 border-slate-300 rounded-md flex justify-center items-center hover:border-orange-400 hover:text-orange-400 hover:bg-orange-100">
               <svg
