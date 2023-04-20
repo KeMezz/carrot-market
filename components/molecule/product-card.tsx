@@ -5,7 +5,6 @@ import Link from "next/link";
 interface ProductProps {
   id: number;
   title: string;
-  color: string;
   price: number;
   heart: number;
   comment: number;
@@ -15,7 +14,6 @@ interface ProductProps {
 const ProductCard = ({
   id,
   title,
-  color,
   price,
   heart,
   comment,
@@ -23,7 +21,7 @@ const ProductCard = ({
 }: ProductProps) => {
   return (
     <Link href={`/products/${id}`}>
-      <article className="flex p-4 gap-4">
+      <article className="flex p-4 gap-4 hover:bg-gray-100">
         {image ? (
           <Image
             alt={title}
@@ -38,8 +36,7 @@ const ProductCard = ({
         )}
         <section className="flex flex-col justify-center">
           <h3 className="font-bold">{title}</h3>
-          <p className="text-xs text-slate-500">{color}</p>
-          <h2 className="mt-2 font-semibold">${price}</h2>
+          <h2 className="mt-2">${price}</h2>
         </section>
         <section className="flex gap-4 mt-auto ml-auto">
           <ProductIcon
