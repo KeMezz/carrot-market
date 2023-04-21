@@ -3,9 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 interface ProfileProps {
-  userId: number;
-  name: string;
-  avatar: string | null;
+  userId?: number;
+  name?: string;
+  avatar?: string | null;
   editable?: boolean;
 }
 
@@ -24,7 +24,7 @@ const Profile: NextPage<ProfileProps> = ({
           priority
           className="rounded-full bg-slate-300"
           src={`https://imagedelivery.net/bNh-NL16qgpnc_aca1vxPw/${avatar}/avatar`}
-          alt={name}
+          alt="avatar"
         />
       ) : (
         <div className="w-20 h-20 rounded-full bg-slate-300" />

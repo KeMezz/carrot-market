@@ -16,7 +16,7 @@ import { useEffect } from "react";
 interface UserEssential {
   id: number;
   name: string;
-  avatar: string;
+  avatar: string | null;
 }
 
 interface PostDetailResponse {
@@ -98,8 +98,8 @@ const CommunityDetail: NextPage = () => {
         <div className="border-b">
           <CommunityCategory category="동네질문" />
           <Profile
-            userId={data?.post.user.id!}
-            name={data?.post.user.name!}
+            userId={data?.post.user.id}
+            name={data?.post.user.name}
             avatar={data?.post.user.avatar}
           />
         </div>
