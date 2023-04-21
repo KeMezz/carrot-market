@@ -1,14 +1,24 @@
+import { cls } from "@libs/client/utils";
 import { NextPage } from "next";
 
 interface FilledBtnProps {
   title: string;
+  disabled?: boolean;
+  onClick?: () => void;
 }
 
-const FilledBtn: NextPage<FilledBtnProps> = ({ title }) => {
+const FilledBtn: NextPage<FilledBtnProps> = ({ title, disabled, onClick }) => {
   return (
     <button
+      onClick={onClick}
       type="submit"
-      className="w-full bg-orange-400 py-2 text-white rounded-md cursor-pointer hover:bg-orange-500"
+      className={cls(
+        "w-full py-2 text-white rounded-md cursor-pointer",
+        disabled
+          ? "bg-gray-300 cursor-not-allowed"
+          : "bg-orange-400 hover:bg-orange-500"
+      )}
+      disabled={disabled}
     >
       {title}
     </button>
