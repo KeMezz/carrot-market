@@ -6,6 +6,7 @@ import useMutation from "@libs/client/useMutation";
 import useUser from "@libs/client/useUser";
 import { ProfileErrorResponse } from "@pages/api/users/me";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -22,8 +23,10 @@ interface EditProfileResponse {
 }
 
 const Edit = () => {
+  const router = useRouter();
+
   // define APIs
-  const { user, isLoading: userLoading } = useUser();
+  const { user } = useUser();
   const [editProfile, { loading, data }] =
     useMutation<EditProfileResponse>(`/api/users/me`);
 
@@ -62,6 +65,7 @@ const Edit = () => {
 
     // when avatar image is not provided, we just send it without image.
     editProfile({ email, phone, name });
+    router.push("/profile");
   };
 
   // fills form initially, with previous user profile data
@@ -70,6 +74,8 @@ const Edit = () => {
       setValue("name", user.name ?? "");
       setValue("email", user.email ?? "");
       setValue("phone", user.phone ?? "");
+    }
+    if (user?.avatar) {
       setAvatarPreview(
         `https://imagedelivery.net/bNh-NL16qgpnc_aca1vxPw/${user.avatar}/avatar`
       );
@@ -88,7 +94,7 @@ const Edit = () => {
 
   // define user avatar variables
   const avatar = watch("avatar");
-  const [avatarPreview, setAvatarPreview] = useState("");
+  const [avatarPreview, setAvatarPreview] = useState<null | string>(null);
 
   // get image url and get upload mutate function
   const [getImageId, { loading: uploadImageLoading }] = useImageId();
@@ -106,16 +112,14 @@ const Edit = () => {
       <form onSubmit={handleSubmit(onValid)}>
         <div className="flex p-4 my-4 gap-4 items-center">
           {avatarPreview ? (
-            <div>
-              <Image
-                alt={user!.name}
-                src={avatarPreview}
-                width={64}
-                height={64}
-                priority
-                className="bg-gray-400 rounded-full"
-              />
-            </div>
+            <Image
+              alt={user!.name}
+              src={avatarPreview}
+              width={64}
+              height={64}
+              priority
+              className="bg-gray-400 rounded-full w-16 h-16 object-cover"
+            />
           ) : (
             <div className="w-16 h-16 bg-gray-400 rounded-full" />
           )}
