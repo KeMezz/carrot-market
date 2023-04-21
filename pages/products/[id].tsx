@@ -52,7 +52,6 @@ const ItemDetail: NextPage = () => {
     createChat({ productId: data?.product.id });
   };
   useEffect(() => {
-    console.log(createChatData);
     if (createChatData && createChatData.success) {
       router.push(`/chat/${createChatData.chatRoom.id}`);
     }
@@ -60,8 +59,6 @@ const ItemDetail: NextPage = () => {
 
   const { user } = useUser();
   const disabled = data?.product.user.id === user?.id;
-
-  console.log(data);
 
   return (
     <Layout canGoBack title={data?.product.name}>

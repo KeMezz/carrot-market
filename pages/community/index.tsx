@@ -32,8 +32,6 @@ const Community: NextPage = () => {
       : null
   );
 
-  console.log(data, latitude, longitude);
-
   return (
     <Layout title="동네생활">
       <section>

@@ -8,7 +8,6 @@ import { useForm } from "react-hook-form";
 import useMutation from "@libs/client/useMutation";
 import { ResponseType } from "@libs/server/withHandler";
 import { useRouter } from "next/router";
-import Link from "next/link";
 
 type method = "email" | "phone";
 

@@ -38,7 +38,6 @@ const Upload = () => {
     if (loading) return;
     if (image && image.length > 0) {
       const imageId = await getImageId({ fileList: image, fileName: name });
-      console.log(imageId);
       return uploadProduct({ name, price, description, image: imageId });
     }
     return uploadProduct({ name, price, description });
