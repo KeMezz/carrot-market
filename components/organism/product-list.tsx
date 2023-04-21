@@ -5,7 +5,7 @@ import { NextPage } from "next";
 import useSWR from "swr";
 
 interface ProductWithUser extends Product {
-  _count: { records: number };
+  _count: { records: number; chatRooms: number };
 }
 
 interface RecordWithProduct extends Record {
@@ -37,8 +37,8 @@ const ProductList: NextPage<RecordProps> = ({ recordKind, title }) => {
             title={record.product.name}
             price={record.product.price}
             heart={record.product._count.records}
-            color="black"
-            comment={0}
+            image={record.product.image}
+            comment={record.product._count.chatRooms}
           />
         ))}
       </section>

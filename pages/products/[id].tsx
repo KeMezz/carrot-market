@@ -9,6 +9,8 @@ import { Product } from "@prisma/client";
 import useMutation from "@libs/client/useMutation";
 import { cls } from "@libs/client/utils";
 import Image from "next/image";
+import useUser from "@libs/client/useUser";
+import { useEffect } from "react";
 
 interface ProductDetailResponse {
   success: boolean;
@@ -19,8 +21,16 @@ interface ProductDetailResponse {
       name: string;
       avatar: string | null;
     };
+    _count: {
+      chatRooms: number;
+    };
   } & Product;
   isLiked: boolean;
+}
+
+interface CreateChatResponse {
+  success: boolean;
+  chatRoom: { id: number };
 }
 
 const ItemDetail: NextPage = () => {
@@ -34,6 +44,24 @@ const ItemDetail: NextPage = () => {
     if (!data) return;
     boundMutate((prev) => prev && { ...prev, isLiked: !data.isLiked }, false);
   };
+
+  const [createChat, { loading: createChatLoading, data: createChatData }] =
+    useMutation<CreateChatResponse>(`/api/chats`);
+  const onTalkClick = async () => {
+    if (createChatLoading) return;
+    createChat({ productId: data?.product.id });
+  };
+  useEffect(() => {
+    console.log(createChatData);
+    if (createChatData && createChatData.success) {
+      router.push(`/chat/${createChatData.chatRoom.id}`);
+    }
+  }, [createChatData, router]);
+
+  const { user } = useUser();
+  const disabled = data?.product.user.id === user?.id;
+
+  console.log(data);
 
   return (
     <Layout canGoBack title={data?.product.name}>
@@ -67,7 +95,15 @@ const ItemDetail: NextPage = () => {
           <h3 className="text-xl">${data?.product.price}</h3>
           <p>{data?.product.description}</p>
           <div className="flex items-center gap-2">
-            <FilledBtn title="Talk to seller" />
+            <FilledBtn
+              title={
+                createChatLoading
+                  ? "Loading..."
+                  : `Talk to Seller (${data?.product._count.chatRooms ?? 0})`
+              }
+              disabled={disabled}
+              onClick={onTalkClick}
+            />
             <button
               onClick={onFavClick}
               className={cls(
@@ -108,7 +144,7 @@ const ItemDetail: NextPage = () => {
         </div>
         {data && data.relatedProducts.length > 0 ? (
           <div className="mt-8">
-            <h3 className="text-2xl font-semibold">Similar items</h3>
+            <h3 className="text-2xl font-semibold">비슷한 상품 보기</h3>
             <div className="grid grid-cols-2 py-4 gap-4">
               {data?.relatedProducts.map((product) => (
                 <GridProduct

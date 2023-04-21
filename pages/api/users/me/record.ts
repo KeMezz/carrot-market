@@ -23,6 +23,7 @@ async function handler(
             include: {
               _count: {
                 select: {
+                  chatRooms: true,
                   records: {
                     where: {
                       kind: "favs",

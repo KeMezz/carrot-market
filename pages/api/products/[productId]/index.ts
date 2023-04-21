@@ -24,6 +24,11 @@ async function handler(
           avatar: true,
         },
       },
+      _count: {
+        select: {
+          chatRooms: true,
+        },
+      },
     },
   });
   const terms = product?.name
