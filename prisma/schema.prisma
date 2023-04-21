@@ -13,26 +13,25 @@ datasource db {
 }
 
 model User {
-  id              Int        @id @default(autoincrement())
-  phone           String?    @unique
-  email           String?    @unique
+  id              Int             @id @default(autoincrement())
+  phone           String?         @unique
+  email           String?         @unique
   avatar          String?
   name            String
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
   tokens          Token[]
   products        Product[]
   posts           Post[]
   answers         Answer[]
   interests       Interest[]
-  writtenReviews  Review[]   @relation(name: "writtenReviews")
-  receivedReviews Review[]   @relation(name: "receivedReviews")
-  // favs            Fav[]
-  // sales           Sale[]
-  // purchases       Purchase[]
+  writtenReviews  Review[]        @relation(name: "writtenReviews")
+  receivedReviews Review[]        @relation(name: "receivedReviews")
   records         Record[]
   streams         Stream[]
-  messages        Message[]
+  streamMessages  StreamMessage[]
+  chatMessages    ChatMessage[]
+  chatRooms       ChatRoom[]
 }
 
 model Token {
@@ -47,19 +46,17 @@ model Token {
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          Int        @id @default(autoincrement())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      Int
   image       String
   name        String
   price       Int
-  description String   @db.MediumText
+  description String     @db.MediumText
   records     Record[]
-  // favs        Fav[]
-  // sales       Sale[]
-  // purchases   Purchase[]
+  chatRooms   ChatRoom[]
 
   @@index([userId])
 }
@@ -121,47 +118,6 @@ model Review {
   @@index([createdForId])
 }
 
-// model Fav {
-//   id        Int      @id @default(autoincrement())
-//   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-//   userId    Int
-//   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-//   productId Int
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-
-//   @@index([userId])
-//   @@index([productId])
-// }
-
-// model Sale {
-//   id        Int      @id @default(autoincrement())
-//   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-//   userId    Int
-//   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-//   productId Int
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-
-//   @@index([userId])
-//   @@index([productId])
-// }
-
-// model Purchase {
-//   id        Int      @id @default(autoincrement())
-//   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-//   userId    Int
-//   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-//   productId Int
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-
-//   @@index([userId])
-//   @@index([productId])
-// }
-
-// you can also do below enum things when you have same structures in multiple models.
-
 enum Kind {
   purchases
   sales
@@ -183,20 +139,20 @@ model Record {
 }
 
 model Stream {
-  id          Int       @id @default(autoincrement())
-  name        String
-  description String    @db.MediumText
-  price       Int
-  messages    Message[]
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      Int
-  createdAt   DateTime  @default(now())
-  updatedAT   DateTime  @updatedAt
+  id             Int             @id @default(autoincrement())
+  name           String
+  description    String          @db.MediumText
+  price          Int
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         Int
+  streamMessages StreamMessage[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 
   @@index([userId])
 }
 
-model Message {
+model StreamMessage {
   id        Int      @id @default(autoincrement())
   message   String   @db.MediumText
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -204,8 +160,37 @@ model Message {
   stream    Stream   @relation(fields: [streamId], references: [id], onDelete: Cascade)
   streamId  Int
   createdAt DateTime @default(now())
-  updatedAT DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([streamId])
+}
+
+model ChatRoom {
+  id           Int           @id @default(autoincrement())
+  reservation  DateTime?
+  creator      User          @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  creatorId    Int
+  product      Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId    Int
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  chatMessages ChatMessage[]
+
+  @@index([creatorId])
+  @@index([productId])
+}
+
+model ChatMessage {
+  id         Int      @id @default(autoincrement())
+  message    String   @db.MediumText
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     Int
+  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  chatRoomId Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([userId])
+  @@index([chatRoomId])
 }
