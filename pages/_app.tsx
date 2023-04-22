@@ -12,7 +12,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <div className="w-full max-w-xl mx-auto">
         <Component {...pageProps} />
       </div>
-      <Script
+      {/* <Script
         src="https://www.googletagmanager.com/gtag/js?id=G-0ZT4MZR8PC"
         strategy="lazyOnload"
         onLoad={() => {
@@ -23,7 +23,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           gtag("js", new Date());
           gtag("config", "G-0ZT4MZR8PC");
         }}
-      />
+      /> */}
     </SWRConfig>
   );
 }
