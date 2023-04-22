@@ -1,21 +1,25 @@
 import Layout from "@components/template/layout";
 import { readFileSync, readdirSync } from "fs";
 import matter from "gray-matter";
-import { NextPage } from "next";
+import { GetStaticProps, NextPage, NextPageContext } from "next";
+import remarkHtml from "remark-html";
+import remarkParse from "remark-parse";
+import { unified } from "unified";
 
-const Post: NextPage = () => {
-  return (
-    <Layout title="h1">
-      <h1>h1</h1>
-    </Layout>
-  );
+interface PostProps {
+  post: string;
+}
+
+const Post: NextPage<PostProps> = ({ post }) => {
+  return <Layout title="h1">{post}</Layout>;
 };
 
 export function getStaticPaths() {
   // telling next.js which pages to generate.
-  // because these pages need to be statically generated, besides it wil get a dynamic [slug] url.
-  const postSlugs = readdirSync("./posts").map((file) => {
-    const content = readFileSync(`./posts/${file}`, { encoding: "utf-8" });
+  // because these pages need to be statically generated, besides these wil get dynamic [slug] url.
+  const fileNames = readdirSync("./posts");
+  const postSlugs = fileNames.map((fileName) => {
+    const content = readFileSync(`./posts/${fileName}`, { encoding: "utf-8" });
     return { params: { slug: matter(content).data.slug } };
   });
   return {
@@ -24,10 +28,24 @@ export function getStaticPaths() {
   };
 }
 
-export function getStaticProps() {
+export const getStaticProps: GetStaticProps = async (ctx) => {
+  const fileNames = readdirSync("./posts");
+  const match = fileNames.filter((fileName) => {
+    const content = readFileSync(`./posts/${fileName}`, { encoding: "utf-8" });
+    const {
+      data: { slug },
+    } = matter(content);
+    return slug === ctx.params?.slug;
+  });
+  const { content } = matter.read(`./posts/${match[0]}`);
+  const { value: post } = await unified()
+    .use(remarkParse)
+    .use(remarkHtml)
+    .process(content);
+
   return {
-    props: {},
+    props: { post },
   };
-}
+};
 
 export default Post;
