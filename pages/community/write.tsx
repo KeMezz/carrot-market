@@ -29,7 +29,6 @@ const Write: NextPage = () => {
 
   const router = useRouter();
   useEffect(() => {
-    console.log(data);
     if (data && data.success) {
       router.push(`/community/${data?.post.id}`);
     }
