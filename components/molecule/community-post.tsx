@@ -27,7 +27,7 @@ const CommunityPost: NextPage<CommunityPostProps> = ({
       <CommunityQuestion question={question} />
       <div className="mt-4 flex justify-between text-xs text-gray-500 pb-4 border-b">
         <p>{user}</p>
-        <p>{createdAt.toLocaleDateString()}</p>
+        <p>{String(createdAt)}</p>
       </div>
       <div className="flex gap-6 border-b pb-3">
         <ReactionBtnBig
