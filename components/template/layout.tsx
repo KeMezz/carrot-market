@@ -7,10 +7,11 @@ import Head from "next/head";
 interface LayoutProps {
   title?: string;
   canGoBack?: boolean;
+  goBackFn?: () => void;
   children: ReactNode;
 }
 
-function Layout({ title, canGoBack, children }: LayoutProps) {
+function Layout({ title, canGoBack, children, goBackFn }: LayoutProps) {
   const { back } = useRouter();
   return (
     <>
@@ -21,7 +22,7 @@ function Layout({ title, canGoBack, children }: LayoutProps) {
         <header className="h-14 border-b flex justify-between items-center font-semibold text-lg fixed top-0 w-full max-w-xl bg-white px-4 z-10">
           <div>
             {canGoBack ? (
-              <button className="flex items-center" onClick={back}>
+              <button className="flex items-center" onClick={goBackFn ?? back}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"

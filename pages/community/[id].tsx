@@ -85,6 +85,10 @@ const CommunityDetail: NextPage = () => {
     sendAnswer(data);
   };
 
+  const goToList = () => {
+    router.push("/community");
+  };
+
   useEffect(() => {
     if (answerData && answerData.success) {
       reset();
@@ -93,7 +97,7 @@ const CommunityDetail: NextPage = () => {
   }, [answerData, reset, mutate]);
 
   return (
-    <Layout canGoBack>
+    <Layout canGoBack goBackFn={goToList}>
       <section className="flex flex-col p-4 gap-4">
         <div className="border-b">
           <CommunityCategory category="동네질문" />
