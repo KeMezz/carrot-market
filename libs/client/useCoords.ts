@@ -6,6 +6,7 @@ interface UseCoordState {
 }
 
 export default function useCoords() {
+  const [loading, setLoading] = useState(true);
   const [coords, setCoords] = useState<UseCoordState>({
     latitude: null,
     longitude: null,
@@ -13,11 +14,13 @@ export default function useCoords() {
   const onSuccess = ({
     coords: { latitude, longitude },
   }: GeolocationPosition) => {
+    setLoading(true);
     setCoords({ latitude, longitude });
+    setLoading(false);
   };
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(onSuccess);
   }, []);
 
-  return coords;
+  return { ...coords, loading };
 }

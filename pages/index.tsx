@@ -8,6 +8,7 @@ import { Product } from "@prisma/client";
 import Link from "next/link";
 import Pagination from "@components/molecule/pagination";
 import { useRouter } from "next/router";
+import SkProductCard from "@components/skeleton/skeleton-product-card";
 
 interface ProductWithCounts extends Product {
   _count: {
@@ -25,13 +26,18 @@ interface ProductsResponse {
 const Home: NextPage = () => {
   const router = useRouter();
   const { error } = useUser();
-  const { data } = useSWR<ProductsResponse>("/api/products");
+  const { data, isLoading } = useSWR<ProductsResponse>("/api/products");
   if ((data && !data.success) || (data && error)) {
     return null;
   }
   return (
     <Layout title="홈">
-      <div className="flex flex-col divide-y">
+      <div className={"flex flex-col divide-y"}>
+        {!isLoading
+          ? null
+          : Array.from({ length: 4 }, (_, i) => i).map((i) => (
+              <SkProductCard key={i} />
+            ))}
         {data?.products.map((product) => (
           <ProductCard
             id={product.id}
