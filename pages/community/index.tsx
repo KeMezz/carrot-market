@@ -3,10 +3,11 @@ import FloatingBtn from "@components/atom/floating-btn";
 import CommunityPost from "@components/molecule/community-post";
 import Layout from "@components/template/layout";
 import Link from "next/link";
-import useSWR from "swr";
+// import useSWR from "swr";
 import { Post } from "@prisma/client";
-import useCoords from "@libs/client/useCoords";
-import SkProductCard from "@components/skeleton/skeleton-product-card";
+import client from "@libs/server/client";
+// import useCoords from "@libs/client/useCoords";
+// import SkProductCard from "@components/skeleton/skeleton-product-card";
 
 interface UserEssential {
   id: number;
@@ -19,30 +20,30 @@ interface PostWithUser extends Post {
   _count: { answers: number; interests: number };
 }
 
-interface PostsResponse {
-  success: boolean;
-  posts: PostWithUser[];
-  isInterest: boolean;
-}
+// interface PostsResponse {
+//   success: boolean;
+//   posts: PostWithUser[];
+//   isInterest: boolean;
+// }
 
-const Community: NextPage = () => {
-  const { latitude, longitude, loading: coordsLoading } = useCoords();
-  const { data, isLoading: postsLoading } = useSWR<PostsResponse>(
-    latitude && longitude
-      ? `/api/posts?latitude=${latitude}&longitude=${longitude}`
-      : null
-  );
-  const isLoading = coordsLoading || postsLoading;
+const Community: NextPage<{ posts: PostWithUser[] }> = ({ posts }) => {
+  // const { latitude, longitude, loading: coordsLoading } = useCoords();
+  // const { data, isLoading: postsLoading } = useSWR<PostsResponse>(
+  //   latitude && longitude
+  //     ? `/api/posts?latitude=${latitude}&longitude=${longitude}`
+  //     : null
+  // );
+  // const isLoading = coordsLoading || postsLoading;
 
   return (
     <Layout title="동네생활">
       <section>
-        {!isLoading
+        {/* {!isLoading
           ? null
           : Array.from({ length: 4 }, (_, i) => i).map((i) => (
               <SkProductCard key={i} />
-            ))}
-        {data?.posts.length === 0 ? (
+            ))} */}
+        {posts?.length === 0 ? (
           <div className="flex flex-col gap-4 justify-center items-center h-[85vh] text-gray-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -61,12 +62,12 @@ const Community: NextPage = () => {
             <h3>아직 동네에 올라온 글이 없어요</h3>
           </div>
         ) : null}
-        {data?.posts?.map((post) => (
+        {posts.map((post) => (
           <CommunityPost
             key={post?.id}
             postId={post.id}
             user={post?.user?.name}
-            createdAt={new Date(post?.createdAt)}
+            createdAt={post?.createdAt}
             question={post?.question}
             interestCount={post?._count?.interests}
             answerCount={post?._count?.answers}
@@ -79,5 +80,34 @@ const Community: NextPage = () => {
     </Layout>
   );
 };
+
+export async function getStaticProps() {
+  console.log("BUILDING COMMUNITY STATICALLY..");
+  const posts = await client.post.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          avatar: true,
+        },
+      },
+      _count: {
+        select: {
+          interests: true,
+          answers: true,
+        },
+      },
+    },
+  });
+  return {
+    props: {
+      posts: JSON.parse(JSON.stringify(posts)),
+    },
+  };
+}
 
 export default Community;

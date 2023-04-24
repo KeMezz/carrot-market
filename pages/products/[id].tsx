@@ -1,16 +1,16 @@
-import { NextPage } from "next";
+import { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import GridProduct from "@components/molecule/grid-product";
 import Layout from "@components/template/layout";
 import Profile from "@components/molecule/profile";
 import FilledBtn from "@components/atom/filled-btn";
 import { useRouter } from "next/router";
-import useSWR from "swr";
 import { Product } from "@prisma/client";
 import useMutation from "@libs/client/useMutation";
 import { cls } from "@libs/client/utils";
 import Image from "next/image";
 import useUser from "@libs/client/useUser";
 import { useEffect } from "react";
+import client from "@libs/server/client";
 
 interface ProductDetailResponse {
   success: boolean;
@@ -33,23 +33,27 @@ interface CreateChatResponse {
   chatRoom: { id: number };
 }
 
-const ItemDetail: NextPage = () => {
+const ItemDetail: NextPage<ProductDetailResponse> = ({
+  product,
+  relatedProducts,
+  isLiked,
+}) => {
   const router = useRouter();
-  const { data, mutate: boundMutate } = useSWR<ProductDetailResponse>(
-    router.query.id ? `/api/products/${router.query.id}` : null
-  );
+  // const { data, mutate: boundMutate } = useSWR<ProductDetailResponse>(
+  //   router.query.id ? `/api/products/${router.query.id}` : null
+  // );
   const [toggleFav] = useMutation(`/api/products/${router.query.id}/fav`);
   const onFavClick = () => {
     toggleFav({});
-    if (!data) return;
-    boundMutate((prev) => prev && { ...prev, isLiked: !data.isLiked }, false);
+    // if (!data) return;
+    // boundMutate((prev) => prev && { ...prev, isLiked: !data.isLiked }, false);
   };
 
   const [createChat, { loading: createChatLoading, data: createChatData }] =
     useMutation<CreateChatResponse>(`/api/chats`);
   const onTalkClick = async () => {
     if (createChatLoading) return;
-    createChat({ productId: data?.product.id });
+    createChat({ productId: product.id });
   };
   useEffect(() => {
     if (createChatData && createChatData.success) {
@@ -58,23 +62,19 @@ const ItemDetail: NextPage = () => {
   }, [createChatData, router]);
 
   const { user } = useUser();
-  const disabled = data?.product.user.id === user?.id;
+  const disabled = product.user.id === user?.id;
 
   return (
-    <Layout canGoBack title={data?.product.name}>
+    <Layout canGoBack title={product.name}>
       <section className="p-4">
         <div className="border-b">
-          {data?.product.image ? (
+          {product.image ? (
             <div className="relative h-96">
               <Image
-                alt={data.product.name}
+                alt={product.name}
                 fill
                 priority
-                src={
-                  data
-                    ? `https://imagedelivery.net/bNh-NL16qgpnc_aca1vxPw/${data.product.image}/public`
-                    : ""
-                }
+                src={`https://imagedelivery.net/bNh-NL16qgpnc_aca1vxPw/${product.image}/public`}
                 className="w-full hover:bg-slate-100 transition-colors rounded-md mx-auto object-cover"
               />
             </div>
@@ -82,21 +82,21 @@ const ItemDetail: NextPage = () => {
             <div className="w-full h-96 bg-slate-300 rounded-md" />
           )}
           <Profile
-            avatar={data?.product.user.avatar ?? null}
-            userId={data?.product.userId!}
-            name={data?.product.user.name!}
+            avatar={product.user.avatar ?? null}
+            userId={product.userId!}
+            name={product.user.name!}
           />
         </div>
         <div className="flex flex-col gap-4 py-4 my-4">
-          <h2 className="text-3xl font-bold">{data?.product.name}</h2>
-          <h3 className="text-xl">${data?.product.price}</h3>
-          <p>{data?.product.description}</p>
+          <h2 className="text-3xl font-bold">{product.name}</h2>
+          <h3 className="text-xl">${product.price}</h3>
+          <p>{product.description}</p>
           <div className="flex items-center gap-2">
             <FilledBtn
               title={
                 createChatLoading
                   ? "Loading..."
-                  : `Talk to Seller (${data?.product._count.chatRooms ?? 0})`
+                  : `Talk to Seller (${product._count.chatRooms ?? 0})`
               }
               disabled={disabled}
               onClick={onTalkClick}
@@ -105,12 +105,12 @@ const ItemDetail: NextPage = () => {
               onClick={onFavClick}
               className={cls(
                 "flex justify-center p-2 rounded-md",
-                data?.isLiked
+                isLiked
                   ? "text-red-400 hover:bg-red-100"
                   : "text-gray-400 hover:bg-gray-100"
               )}
             >
-              {data?.isLiked ? (
+              {isLiked ? (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -139,11 +139,11 @@ const ItemDetail: NextPage = () => {
             </button>
           </div>
         </div>
-        {data && data.relatedProducts.length > 0 ? (
+        {relatedProducts.length > 0 ? (
           <div className="mt-8">
             <h3 className="text-2xl font-semibold">비슷한 상품 보기</h3>
             <div className="grid grid-cols-2 py-4 gap-4">
-              {data?.relatedProducts.map((product) => (
+              {relatedProducts.map((product) => (
                 <GridProduct
                   key={product.id}
                   productId={product.id}
@@ -158,6 +158,74 @@ const ItemDetail: NextPage = () => {
       </section>
     </Layout>
   );
+};
+
+export const getStaticPaths: GetStaticPaths = () => {
+  return {
+    paths: [],
+    fallback: "blocking",
+  };
+};
+
+export const getStaticProps: GetStaticProps = async (ctx) => {
+  if (!ctx.params?.id) {
+    return { props: {} };
+  }
+
+  const cleanId = Number(ctx.params.id);
+  const product = await client.product.findUnique({
+    where: {
+      id: cleanId,
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          avatar: true,
+        },
+      },
+      _count: {
+        select: {
+          chatRooms: true,
+        },
+      },
+    },
+  });
+  const terms = product?.name
+    .split(" ")
+    .map((word) => ({ name: { contains: word } }));
+  const relatedProducts = await client.product.findMany({
+    where: {
+      OR: terms,
+      AND: {
+        id: {
+          not: cleanId,
+        },
+      },
+    },
+  });
+  const isLiked = false;
+  // const isLiked = Boolean(
+  //   await client.record.findFirst({
+  //     where: {
+  //       productId: product?.id,
+  //       userId: user?.id,
+  //       kind: "favs",
+  //     },
+  //     select: {
+  //       id: true,
+  //     },
+  //   })
+  // );
+
+  return {
+    props: {
+      product: JSON.parse(JSON.stringify(product)),
+      relatedProducts: JSON.parse(JSON.stringify(relatedProducts)),
+      isLiked,
+    },
+  };
 };
 
 export default ItemDetail;
