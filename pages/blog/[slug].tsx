@@ -27,14 +27,9 @@ const Post: NextPage<PostProps> = ({ post, data }) => {
 export function getStaticPaths() {
   // telling next.js which pages to generate.
   // because these pages need to be statically generated, besides these wil get dynamic [slug] url.
-  const fileNames = readdirSync("./posts");
-  const postSlugs = fileNames.map((fileName) => {
-    const content = readFileSync(`./posts/${fileName}`, { encoding: "utf-8" });
-    return { params: { slug: matter(content).data.slug } };
-  });
   return {
-    paths: [...postSlugs],
-    fallback: false,
+    paths: [],
+    fallback: "blocking",
   };
 }
 
