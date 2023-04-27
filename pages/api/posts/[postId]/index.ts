@@ -11,41 +11,16 @@ async function handler(
     query: { postId },
     session: { user },
   } = req;
-  const post = await client.post.findUnique({
+  const interests = await client.interest.count({
     where: {
-      id: Number(postId),
-    },
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          avatar: true,
-        },
-      },
-      answers: {
-        select: {
-          answer: true,
-          id: true,
-          createdAt: true,
-          user: {
-            select: {
-              id: true,
-              name: true,
-              avatar: true,
-            },
-          },
-        },
-      },
-      _count: {
-        select: {
-          answers: true,
-          interests: true,
-        },
-      },
+      postId: Number(postId),
     },
   });
-
+  const answers = await client.answer.count({
+    where: {
+      postId: Number(postId),
+    },
+  });
   const isInterest = Boolean(
     await client.interest.findFirst({
       where: {
@@ -57,8 +32,7 @@ async function handler(
       },
     })
   );
-
-  res.json({ success: true, post, isInterest });
+  res.json({ success: true, isInterest, _count: { interests, answers } });
 }
 
 export default withApiSession(
