@@ -55,8 +55,6 @@ async function handler(
       },
     });
   }
-
-  await res.revalidate("/community");
   res.json({ success: true });
 }
 
