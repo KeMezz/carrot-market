@@ -8,24 +8,27 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ) {
   const {
-    query,
-    body: { question, latitude, longitude },
+    // query,
+    body: { question },
     session: { user },
   } = req;
   if (req.method === "GET") {
-    const { latitude, longitude } = query;
-    const parsedLatitude = parseFloat(latitude!?.toString());
-    const parsedLongitude = parseFloat(longitude!?.toString());
+    // const { latitude, longitude } = query;
+    // const parsedLatitude = parseFloat(latitude!?.toString());
+    // const parsedLongitude = parseFloat(longitude!?.toString());
     const posts = await client.post.findMany({
-      where: {
-        latitude: {
-          gte: parsedLatitude - 0.01,
-          lte: parsedLatitude + 0.01,
-        },
-        longitude: {
-          gte: parsedLongitude - 0.01,
-          lte: parsedLongitude + 0.01,
-        },
+      // where: {
+      //   latitude: {
+      //     gte: parsedLatitude - 0.01,
+      //     lte: parsedLatitude + 0.01,
+      //   },
+      //   longitude: {
+      //     gte: parsedLongitude - 0.01,
+      //     lte: parsedLongitude + 0.01,
+      //   },
+      // },
+      orderBy: {
+        createdAt: "desc",
       },
       include: {
         user: {
@@ -49,8 +52,8 @@ async function handler(
     const post = await client.post.create({
       data: {
         question,
-        latitude,
-        longitude,
+        // latitude,
+        // longitude,
         user: {
           connect: {
             id: user?.id,
@@ -58,7 +61,6 @@ async function handler(
         },
       },
     });
-    await res.revalidate("/community");
     return res.json({ success: true, post });
   }
 }
