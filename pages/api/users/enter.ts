@@ -32,14 +32,13 @@ async function handler(
   });
 
   if (phone) {
-    console.log("PHONE DETECTED ", payload);
-    // const msg = await twilioClient.messages.create({
-    //   messagingServiceSid: process.env.TWILIO_MSID,
-    //   from: process.env.PHONE_NUMBER!,
-    //   to: process.env.MY_PHONE!,
-    //   body: `Your login token is ${payload}`,
-    // });
-    // console.log(msg);
+    // console.log("PHONE DETECTED ", payload);
+    await twilioClient.messages.create({
+      messagingServiceSid: process.env.TWILIO_MSID,
+      from: process.env.PHONE_NUMBER!,
+      to: process.env.MY_PHONE!,
+      body: `Your login token is ${payload}`,
+    });
   } else if (email) {
     const mailOptions = {
       from: process.env.MAIL_ID,
