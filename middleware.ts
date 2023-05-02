@@ -5,6 +5,10 @@ import {
   userAgent,
 } from "next/server";
 
+export const config = {
+  matcher: "/",
+};
+
 export function middleware(req: NextRequest, ev: NextFetchEvent) {
   const ua = userAgent(req);
   if (ua.isBot) {
