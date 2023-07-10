@@ -68,7 +68,7 @@ const ChatDetail: NextPage = () => {
   return (
     <Layout
       canGoBack
-      title={`${chatMessagesData?.chatRoom.product.name ?? ""} 채팅`}
+      title={`${chatMessagesData?.chatRoom.product.name ?? ""}`}
     >
       <section className="p-4 my-8 flex flex-col gap-4 mb-20">
         {chatMessagesData?.messages.map((message) => (
