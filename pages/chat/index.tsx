@@ -29,9 +29,9 @@ const Chat: NextPage = () => {
           <ChatPreview
             id={chatRoom.id}
             key={chatRoom.id}
-            name={chatRoom.chatMessages[0].user.name}
-            message={chatRoom.chatMessages[0].message}
-            avatar={chatRoom.chatMessages[0].user.avatar}
+            name={chatRoom?.chatMessages[0]?.user?.name}
+            message={chatRoom?.chatMessages[0]?.message}
+            avatar={chatRoom?.chatMessages[0]?.user?.avatar}
           />
         ))}
       </section>
