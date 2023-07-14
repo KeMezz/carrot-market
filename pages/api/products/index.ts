@@ -10,6 +10,9 @@ async function handler(
   if (req.method === "GET") {
     const totalCount = Math.ceil((await client.product.count()) / 10);
     const products = await client.product.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
       include: {
         _count: {
           select: {
