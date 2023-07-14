@@ -72,33 +72,4 @@ const Community: NextPage = () => {
   );
 };
 
-// export async function getStaticProps() {
-//   console.log("BUILDING COMMUNITY STATICALLY..");
-//   const posts = await client.post.findMany({
-//     orderBy: {
-//       createdAt: "desc",
-//     },
-//     include: {
-//       user: {
-//         select: {
-//           id: true,
-//           name: true,
-//           avatar: true,
-//         },
-//       },
-//       _count: {
-//         select: {
-//           interests: true,
-//           answers: true,
-//         },
-//       },
-//     },
-//   });
-//   return {
-//     props: {
-//       posts: JSON.parse(JSON.stringify(posts)),
-//     },
-//   };
-// }
-
 export default Community;

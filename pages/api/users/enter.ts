@@ -32,7 +32,6 @@ async function handler(
   });
 
   if (phone) {
-    // console.log("PHONE DETECTED ", payload);
     await twilioClient.messages.create({
       messagingServiceSid: process.env.TWILIO_MSID,
       from: process.env.PHONE_NUMBER!,
