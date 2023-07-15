@@ -10,6 +10,7 @@ import { cls } from "@libs/client/utils";
 import Image from "next/image";
 import useUser from "@libs/client/useUser";
 import { useEffect } from "react";
+import useSWR from "swr";
 import client from "@libs/server/client";
 
 interface ProductDetailResponse {
@@ -36,17 +37,16 @@ interface CreateChatResponse {
 const ItemDetail: NextPage<ProductDetailResponse> = ({
   product,
   relatedProducts,
-  isLiked,
 }) => {
   const router = useRouter();
-  // const { data, mutate: boundMutate } = useSWR<ProductDetailResponse>(
-  //   router.query.id ? `/api/products/${router.query.id}` : null
-  // );
+  const { data, mutate: boundMutate } = useSWR<ProductDetailResponse>(
+    router.query.id ? `/api/products/${router.query.id}` : null
+  );
   const [toggleFav] = useMutation(`/api/products/${router.query.id}/fav`);
   const onFavClick = () => {
     toggleFav({});
-    // if (!data) return;
-    // boundMutate((prev) => prev && { ...prev, isLiked: !data.isLiked }, false);
+    if (!data) return;
+    boundMutate((prev) => prev && { ...prev, isLiked: !data.isLiked }, false);
   };
 
   const [createChat, { loading: createChatLoading, data: createChatData }] =
@@ -105,12 +105,12 @@ const ItemDetail: NextPage<ProductDetailResponse> = ({
               onClick={onFavClick}
               className={cls(
                 "flex justify-center p-2 rounded-md",
-                isLiked
+                data?.isLiked
                   ? "text-red-400 hover:bg-red-100"
                   : "text-gray-400 hover:bg-gray-100"
               )}
             >
-              {isLiked ? (
+              {data?.isLiked ? (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -205,25 +205,11 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
       },
     },
   });
-  const isLiked = false;
-  // const isLiked = Boolean(
-  //   await client.record.findFirst({
-  //     where: {
-  //       productId: product?.id,
-  //       userId: user?.id,
-  //       kind: "favs",
-  //     },
-  //     select: {
-  //       id: true,
-  //     },
-  //   })
-  // );
 
   return {
     props: {
       product: JSON.parse(JSON.stringify(product)),
       relatedProducts: JSON.parse(JSON.stringify(relatedProducts)),
-      isLiked,
     },
   };
 };
