@@ -12,42 +12,10 @@ async function handler(
     session: { user },
   } = req;
   const cleanId = Number(productId);
-  const product = await client.product.findUnique({
-    where: {
-      id: cleanId,
-    },
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          avatar: true,
-        },
-      },
-      _count: {
-        select: {
-          chatRooms: true,
-        },
-      },
-    },
-  });
-  const terms = product?.name
-    .split(" ")
-    .map((word) => ({ name: { contains: word } }));
-  const relatedProducts = await client.product.findMany({
-    where: {
-      OR: terms,
-      AND: {
-        id: {
-          not: cleanId,
-        },
-      },
-    },
-  });
   const isLiked = Boolean(
     await client.record.findFirst({
       where: {
-        productId: product?.id,
+        productId: cleanId,
         userId: user?.id,
         kind: "favs",
       },
@@ -56,7 +24,7 @@ async function handler(
       },
     })
   );
-  res.json({ success: true, product, relatedProducts, isLiked });
+  res.json({ success: true, isLiked });
 }
 
 export default withApiSession(
