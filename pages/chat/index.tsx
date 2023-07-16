@@ -2,6 +2,7 @@ import { NextPage } from "next";
 import ChatPreview from "@components/molecule/chat-preview";
 import Layout from "@components/template/layout";
 import useSWR from "swr";
+import SkChatPreview from "@components/skeleton/skeleton-chat-preview";
 
 interface ChatsResponse {
   success: boolean;
@@ -21,9 +22,14 @@ interface ChatsResponse {
 }
 
 const Chat: NextPage = () => {
-  const { data } = useSWR<ChatsResponse>(`/api/chats`);
+  const { isLoading, data } = useSWR<ChatsResponse>(`/api/chats`);
   return (
     <Layout title="채팅">
+      {!isLoading
+        ? null
+        : Array.from({ length: 4 }, (_, i) => i).map((i) => (
+            <SkChatPreview key={i} />
+          ))}
       {data?.chatRooms.length === 0 ? (
         <section className="flex min-h-[calc(100vh-152px)]">
           <div className="flex flex-col gap-4 justify-center items-center text-gray-400 m-auto">
