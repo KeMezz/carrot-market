@@ -1,11 +1,8 @@
-import FloatingBtn from "@components/atom/floating-btn";
 import Pagination from "@components/molecule/pagination";
 import StreamPreview from "@components/molecule/stream-preview";
 import Layout from "@components/template/layout";
 import { Stream } from "@prisma/client";
-import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
 import useSWR from "swr";
 
 interface StreamsResponse {
@@ -19,8 +16,11 @@ const Streams = () => {
   const { data } = useSWR<StreamsResponse>(
     `/api/streams?page=${router.query.page ?? 1}`
   );
+  const fibFn = () => {
+    router.push("/streams/upload");
+  };
   return (
-    <Layout title="라이브">
+    <Layout title="라이브" showFib fibFn={fibFn} fibIcon="record">
       <section className="flex flex-col divide-y">
         {[
           data?.streams.map((stream) => (
@@ -32,9 +32,6 @@ const Streams = () => {
           totalCount={data?.totalCount!}
         />
       </section>
-      <Link href="/streams/upload">
-        <FloatingBtn d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
-      </Link>
     </Layout>
   );
 };

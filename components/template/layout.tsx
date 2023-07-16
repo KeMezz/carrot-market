@@ -11,7 +11,7 @@ interface LayoutProps {
   goBackFn?: () => void;
   children: ReactNode;
   showFib?: boolean;
-  fibIcon?: "add" | "write";
+  fibIcon?: "add" | "write" | "record";
   fibFn?: () => void;
 }
 
