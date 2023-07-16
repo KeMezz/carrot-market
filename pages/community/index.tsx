@@ -6,6 +6,7 @@ import useSWR from "swr";
 import { Post } from "@prisma/client";
 import SkProductCard from "@components/skeleton/skeleton-product-card";
 import { useRouter } from "next/router";
+import SkCommunityPost from "@components/skeleton/skeleton-community-post";
 
 interface UserEssential {
   id: number;
@@ -36,7 +37,7 @@ const Community: NextPage = () => {
         {!isLoading
           ? null
           : Array.from({ length: 4 }, (_, i) => i).map((i) => (
-              <SkProductCard key={i} />
+              <SkCommunityPost key={i} />
             ))}
         {data?.posts.length === 0 ? (
           <div className="flex flex-col gap-4 justify-center items-center min-h-[calc(100vh-152px)] text-gray-400">
