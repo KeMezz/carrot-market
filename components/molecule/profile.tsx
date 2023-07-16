@@ -36,7 +36,7 @@ const Profile: NextPage<ProfileProps> = ({
             <button className="text-xs hover:underline">Edit Profile →</button>
           </Link>
         ) : (
-          <Link href={`/users/profiles/${userId}`}>
+          <Link href={`/users/${userId}`}>
             <button className="text-xs hover:underline">View Profile →</button>
           </Link>
         )}
