@@ -30,8 +30,11 @@ const Home: NextPage = () => {
   if ((data && !data.success) || (data && error)) {
     return null;
   }
+  const fibFn = () => {
+    router.push("/products/upload");
+  };
   return (
-    <Layout title="홈">
+    <Layout title="홈" showFib fibFn={fibFn} fibIcon="add">
       {!isLoading
         ? null
         : Array.from({ length: 4 }, (_, i) => i).map((i) => (
@@ -76,9 +79,9 @@ const Home: NextPage = () => {
           />
         </div>
       )}
-      <Link href="/products/upload">
+      {/* <Link href="/products/upload">
         <FloatingBtn d="M12 4.5v15m7.5-7.5h-15" />
-      </Link>
+      </Link> */}
     </Layout>
   );
 };
