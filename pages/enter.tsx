@@ -1,13 +1,12 @@
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
-import OutlineBtn from "@components/atom/outline-btn";
-import TabBtn from "@components/atom/tab-btn";
 import FilledBtn from "@components/atom/filled-btn";
 import TextInput from "@components/atom/text-input";
 import { useForm } from "react-hook-form";
 import useMutation from "@libs/client/useMutation";
 import { ResponseType } from "@libs/server/withHandler";
 import { useRouter } from "next/router";
+import { useDeepCompareEffect } from "use-deep-compare";
 
 type method = "email" | "phone";
 
@@ -52,12 +51,12 @@ const Enter: NextPage = () => {
   }, [data?.success, reset]);
 
   const router = useRouter();
-  useEffect(() => {
+
+  useDeepCompareEffect(() => {
     if (tokenData && tokenData.success) {
-      console.log("TD", tokenData);
-      router.push("/?page=1").then(() => router.reload());
+      router.push("/?page=1");
     }
-  }, [tokenData, router]);
+  }, [tokenData, router.query]);
 
   return (
     <>
