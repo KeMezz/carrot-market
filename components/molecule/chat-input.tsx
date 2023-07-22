@@ -7,7 +7,7 @@ interface ChatInputProps {
 
 const ChatInput: NextPage<ChatInputProps> = ({ register }) => {
   return (
-    <div className="fixed bottom-0 p-4 w-full flex items-center">
+    <div className="fixed bottom-0 p-4 w-full flex items-center max-w-[608px]">
       <input
         {...register}
         type="text"
