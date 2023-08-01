@@ -49,8 +49,10 @@ async function handler(
     };
     nodemailerClient.sendMail(mailOptions, (error, response) => {
       if (error) {
+        console.error(error);
         return res.status(500).json({ success: false, ...error });
       } else {
+        console.log(response);
         return res.json({ success: true, ...response });
       }
     });
