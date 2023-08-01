@@ -14,7 +14,7 @@ async function handler(
   const body = phone ? { phone } : email ? { email } : null;
   if (!body) return res.status(400).json({ success: false });
   const payload = Math.floor(100000 + Math.random() * 900000) + "";
-  const token = await client.token.create({
+  await client.token.create({
     data: {
       payload,
       user: {
@@ -39,6 +39,8 @@ async function handler(
       body: `Your login token is ${payload}`,
     });
   } else if (email) {
+    console.log("email", email);
+    console.log(nodemailerClient);
     const mailOptions = {
       from: process.env.MAIL_ID,
       to: email,
