@@ -7,6 +7,7 @@ import useMutation from "@libs/client/useMutation";
 import { ResponseType } from "@libs/server/withHandler";
 import { useRouter } from "next/router";
 import { useDeepCompareEffect } from "use-deep-compare";
+import Head from "next/head";
 
 type method = "email" | "phone";
 
@@ -60,9 +61,12 @@ const Enter: NextPage = () => {
 
   return (
     <>
+      <Head>
+        <title>로그인 | 캐롯마켓</title>
+      </Head>
       <div className="h-48 flex flex-col justify-center items-center text-center text-3xl gap-2">
         <p>🥕</p>
-        <h1 className="font-bold">Enter to Karrot</h1>
+        <h1 className="font-bold">캐롯마켓 로그인</h1>
       </div>
       {/* {data?.success ? null : (
         <div className="flex">
@@ -92,10 +96,10 @@ const Enter: NextPage = () => {
               })}
               type="number"
               id="token"
-              name="Confirmation Token"
+              name="6자리 인증번호"
               maxLength={6}
             />
-            <FilledBtn title={!tokenLoading ? "Confirm Token" : "Loading..."} />
+            <FilledBtn title="인증번호 제출" loading={tokenLoading} />
           </form>
         </>
       ) : (
@@ -110,9 +114,9 @@ const Enter: NextPage = () => {
                   })}
                   type="email"
                   id="email"
-                  name="Email Address"
+                  name="이메일 주소"
                 />
-                <FilledBtn title={!loading ? "Get login link" : "Loading..."} />
+                <FilledBtn title="인증번호 발송" loading={loading} />
               </>
             ) : (
               <>
@@ -123,11 +127,9 @@ const Enter: NextPage = () => {
                   })}
                   type="number"
                   id="phone"
-                  name="Phone Number"
+                  name="휴대폰 번호"
                 />
-                <FilledBtn
-                  title={!loading ? "Get one-time password" : "Loading..."}
-                />
+                <FilledBtn title="인증번호 발송" loading={loading} />
               </>
             )}
           </form>
