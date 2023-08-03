@@ -36,7 +36,7 @@ const ProductCard = ({
         )}
         <section className="flex flex-col justify-center">
           <h3 className="font-bold">{title}</h3>
-          <h2 className="mt-2">${price}</h2>
+          <h2 className="mt-2">{price}원</h2>
         </section>
         <section className="flex gap-4 mt-auto ml-auto">
           <ProductIcon

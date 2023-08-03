@@ -89,14 +89,14 @@ const ItemDetail: NextPage<ProductDetailResponse> = ({
         </div>
         <div className="flex flex-col gap-4 py-4 my-4">
           <h2 className="text-3xl font-bold">{product.name}</h2>
-          <h3 className="text-xl">${product.price}</h3>
+          <h3 className="text-xl">{product.price}원</h3>
           <p>{product.description}</p>
           <div className="flex items-center gap-2">
             <FilledBtn
               title={
                 createChatLoading
                   ? "Loading..."
-                  : `Talk to Seller (${product._count.chatRooms ?? 0})`
+                  : `판매자와 채팅하기 (${product._count.chatRooms ?? 0})`
               }
               disabled={disabled}
               onClick={onTalkClick}
