@@ -1,15 +1,14 @@
 import React from "react";
-import { NextPage, NextPageContext } from "next";
+import { NextPage } from "next";
 import StarRating from "@components/atom/star-rating";
 import Profile from "@components/molecule/profile";
 import ProfileBtn from "@components/atom/profile-button";
 import Layout from "@components/template/layout";
 import useUser from "@libs/client/useUser";
-import useSWR, { SWRConfig } from "swr";
-import { Review, User } from "@prisma/client";
+import useSWR from "swr";
+import { Review } from "@prisma/client";
 import Link from "next/link";
-import client from "@libs/server/client";
-import { withSsrSession } from "@libs/server/withSession";
+import SkProfile from "@components/skeleton/skeleton-profile";
 
 interface ReviewWithCreatedBy extends Review {
   createdBy: {
@@ -25,21 +24,22 @@ interface ReviewResponse {
 }
 
 const MyKarrot: NextPage = () => {
-  const { user } = useUser();
+  const { user, isLoading } = useUser();
   const { data } = useSWR<ReviewResponse>(`/api/reviews`);
-  if (!user) {
-    return null;
-  }
   return (
     <Layout title="나의 캐럿">
       <section>
         <div className="p-4">
-          <Profile
-            name={user?.name}
-            userId={user?.id}
-            avatar={user.avatar}
-            editable
-          />
+          {isLoading ? (
+            <SkProfile />
+          ) : (
+            <Profile
+              name={user?.name}
+              userId={user?.id}
+              avatar={user?.avatar}
+              editable
+            />
+          )}
         </div>
         <div className="flex justify-around p-4">
           <Link href="/profile/sold">
@@ -80,31 +80,4 @@ const MyKarrot: NextPage = () => {
   );
 };
 
-const Page: NextPage<{ profile: User }> = ({ profile }) => {
-  return (
-    <SWRConfig
-      value={{
-        fallback: {
-          "/api/users/me": { success: true, profile },
-        },
-      }}
-    >
-      <MyKarrot />
-    </SWRConfig>
-  );
-};
-
-export const getServerSideProps = withSsrSession(async function ({
-  req,
-}: NextPageContext) {
-  const profile = await client.user.findUnique({
-    where: {
-      id: req?.session.user?.id,
-    },
-  });
-  return {
-    props: { profile: JSON.parse(JSON.stringify(profile)) },
-  };
-});
-
-export default Page;
+export default MyKarrot;
