@@ -31,10 +31,10 @@ const Enter: NextPage = () => {
     useForm<TokenForm>();
 
   const [loginMethod, setLoginMethod] = useState<method>("email");
-  const changeMethod = (targetMethod: method) => {
-    reset();
-    setLoginMethod(targetMethod);
-  };
+  // const changeMethod = (targetMethod: method) => {
+  //   reset();
+  //   setLoginMethod(targetMethod);
+  // };
 
   const onValid = (validForm: EnterForm) => {
     if (loading) return;
