@@ -5,9 +5,15 @@ interface FilledBtnProps {
   title: string;
   disabled?: boolean;
   onClick?: () => void;
+  loading?: boolean;
 }
 
-const FilledBtn: NextPage<FilledBtnProps> = ({ title, disabled, onClick }) => {
+const FilledBtn: NextPage<FilledBtnProps> = ({
+  title,
+  disabled,
+  onClick,
+  loading,
+}) => {
   return (
     <button
       onClick={onClick}
@@ -20,7 +26,7 @@ const FilledBtn: NextPage<FilledBtnProps> = ({ title, disabled, onClick }) => {
       )}
       disabled={disabled}
     >
-      {title}
+      {loading ? "로딩 중..." : title}
     </button>
   );
 };
