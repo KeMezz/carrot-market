@@ -28,7 +28,7 @@ function Layout({
   return (
     <>
       <Head>
-        <title>{title}</title>
+        <title>{title} | 캐롯마켓</title>
       </Head>
       <header className="h-14 border-b flex justify-between items-center font-semibold text-lg fixed top-0 w-full max-w-xl bg-white px-4 z-10">
         <div>

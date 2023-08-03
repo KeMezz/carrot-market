@@ -33,11 +33,13 @@ const Profile: NextPage<ProfileProps> = ({
         <p className="text-lg font-semibold">{name}</p>
         {editable ? (
           <Link href="/profile/edit">
-            <button className="text-xs hover:underline">Edit Profile →</button>
+            <button className="text-xs hover:underline">
+              프로필 수정하기 →
+            </button>
           </Link>
         ) : (
           <Link href={`/users/${userId}`}>
-            <button className="text-xs hover:underline">View Profile →</button>
+            <button className="text-xs hover:underline">프로필 보기 →</button>
           </Link>
         )}
       </div>
