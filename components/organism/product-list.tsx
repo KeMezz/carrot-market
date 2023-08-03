@@ -3,6 +3,7 @@ import Layout from "@components/template/layout";
 import { Product, Record } from "@prisma/client";
 import { NextPage } from "next";
 import useSWR from "swr";
+import EmptyNoFooter from "./empty-no-footer";
 
 interface ProductWithUser extends Product {
   _count: { records: number; chatRooms: number };
@@ -30,6 +31,9 @@ const ProductList: NextPage<RecordProps> = ({ recordKind, title }) => {
   return (
     <Layout title={title} canGoBack>
       <section className="flex flex-col divide-y">
+        {data.records.length === 0 ? (
+          <EmptyNoFooter text={`표시할 ${title}이 없어요!`} />
+        ) : null}
         {data?.records.map((record) => (
           <ProductCard
             key={record.product.id}
