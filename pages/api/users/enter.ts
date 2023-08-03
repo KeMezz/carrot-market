@@ -39,22 +39,20 @@ async function handler(
       body: `Your login token is ${payload}`,
     });
   } else if (email) {
-    console.log("email", email);
-    console.log(nodemailerClient);
     const mailOptions = {
       from: process.env.MAIL_ID,
       to: email,
       subject: "Carrot Market Authentication Code",
       text: `Your login token is ${payload}`,
     };
-    nodemailerClient.sendMail(mailOptions, (error, response) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).json({ success: false, ...error });
-      } else {
-        console.log(response);
-        return res.json({ success: true, ...response });
-      }
+    await new Promise(() => {
+      nodemailerClient.sendMail(mailOptions, (error, response) => {
+        if (error) {
+          return res.status(500).json({ success: false, ...error });
+        } else {
+          return res.json({ success: true, ...response });
+        }
+      });
     });
     nodemailerClient.close();
   }
