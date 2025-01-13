@@ -7,9 +7,8 @@ generator client {
 }
 
 datasource db {
-  provider     = "mysql"
-  url          = env("DATABASE_URL")
-  relationMode = "prisma"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -54,7 +53,7 @@ model Product {
   image       String
   name        String
   price       Int
-  description String     @db.MediumText
+  description String
   records     Record[]
   chatRooms   ChatRoom[]
 
@@ -65,7 +64,7 @@ model Post {
   id        Int        @id @default(autoincrement())
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
-  question  String     @db.MediumText
+  question  String
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   answers   Answer[]
@@ -80,7 +79,7 @@ model Answer {
   id        Int      @id @default(autoincrement())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
-  answer    String   @db.MediumText
+  answer    String
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    Int
   createdAt DateTime @default(now())
@@ -105,7 +104,7 @@ model Interest {
 
 model Review {
   id           Int      @id @default(autoincrement())
-  review       String   @db.MediumText
+  review       String
   score        Int
   createdBy    User     @relation(name: "writtenReviews", fields: [createdById], references: [id], onDelete: Cascade)
   createdById  Int
@@ -141,7 +140,7 @@ model Record {
 model Stream {
   id             Int             @id @default(autoincrement())
   name           String
-  description    String          @db.MediumText
+  description    String
   price          Int
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId         Int
@@ -154,7 +153,7 @@ model Stream {
 
 model StreamMessage {
   id        Int      @id @default(autoincrement())
-  message   String   @db.MediumText
+  message   String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
   stream    Stream   @relation(fields: [streamId], references: [id], onDelete: Cascade)
@@ -183,7 +182,7 @@ model ChatRoom {
 
 model ChatMessage {
   id         Int      @id @default(autoincrement())
-  message    String   @db.MediumText
+  message    String
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     Int
   chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
