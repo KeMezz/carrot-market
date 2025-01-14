@@ -13,6 +13,8 @@ import { useForm } from "react-hook-form";
 import useMutation from "@libs/client/useMutation";
 import { useEffect } from "react";
 import client from "@libs/server/client";
+import Image from "next/image";
+import { formatRelativeTime } from "@libs/client/utils";
 
 interface UserEssential {
   id: number;
@@ -111,6 +113,9 @@ const CommunityDetail: NextPage<{ post: PostWithUser }> = ({ post }) => {
           />
         </div>
         <CommunityQuestion question={post.question} />
+        <span className="text-xs text-gray-400 self-end">
+          {formatRelativeTime(new Date(post.createdAt))}
+        </span>
         <div className="flex gap-6 border-t border-b py-3">
           <ReactionBtn
             isClicked={data?.isInterest}
@@ -127,10 +132,19 @@ const CommunityDetail: NextPage<{ post: PostWithUser }> = ({ post }) => {
         </div>
         {post.answers.map((answer) => (
           <div className="flex gap-4" key={answer.id}>
-            <div className="bg-gray-300 w-12 h-12 rounded-full flex-shrink-0" />
+            <Image
+              width={48}
+              height={48}
+              priority
+              className="bg-gray-300 w-12 h-12 rounded-full flex-shrink-0"
+              src={`https://imagedelivery.net/bNh-NL16qgpnc_aca1vxPw/${answer.user.avatar}/avatar`}
+              alt="avatar"
+            />
             <div className="flex flex-col gap-1 w-fit">
               <h3 className="text-sm">{answer.user.name}</h3>
-              <p className="text-xs text-gray-400">{answer.createdAt}</p>
+              <p className="text-xs text-gray-400">
+                {formatRelativeTime(new Date(answer.createdAt))}
+              </p>
               <p className="whitespace-pre-wrap">{answer.answer}</p>
             </div>
           </div>
