@@ -127,11 +127,11 @@ const CommunityDetail: NextPage<{ post: PostWithUser }> = ({ post }) => {
         </div>
         {post.answers.map((answer) => (
           <div className="flex gap-4" key={answer.id}>
-            <div className="bg-gray-300 w-12 h-12 rounded-full" />
+            <div className="bg-gray-300 w-12 h-12 rounded-full flex-shrink-0" />
             <div className="flex flex-col gap-1 w-fit">
               <h3 className="text-sm">{answer.user.name}</h3>
               <p className="text-xs text-gray-400">{answer.createdAt}</p>
-              <p>{answer.answer}</p>
+              <p className="whitespace-pre-wrap">{answer.answer}</p>
             </div>
           </div>
         ))}

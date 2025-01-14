@@ -8,7 +8,7 @@ const CommunityQuestion = ({ question }: CommunityQuestionProps) => {
   return (
     <h2 className="text-lg flex gap-1">
       <span className="text-orange-400">Q.</span>
-      {question}
+      <span className="whitespace-pre-wrap">{question}</span>
     </h2>
   );
 };
