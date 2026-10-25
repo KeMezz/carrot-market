@@ -2,6 +2,6 @@
 module.exports = {
   reactStrictMode: true,
   images: {
-    domains: ["imagedelivery.net"],
+    remotePatterns: [{ protocol: "https", hostname: "imagedelivery.net" }],
   },
 };

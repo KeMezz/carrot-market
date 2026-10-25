@@ -22,11 +22,7 @@ async function handler(
             },
           },
           {
-            chatMessages: {
-              some: {
-                userId: user?.id,
-              },
-            },
+            creatorId: user?.id,
           },
         ],
       },

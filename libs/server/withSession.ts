@@ -6,6 +6,11 @@ declare module "iron-session" {
     user?: {
       id: number;
     };
+    // 인증번호를 발송한 브라우저만 확인 요청을 할 수 있도록 묶어두는 값
+    pendingAuth?: {
+      userId: number;
+      issuedAt: number;
+    };
   }
 }
 

@@ -30,7 +30,7 @@ export default function withHandler({
       await handlerFn(req, res);
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ error });
+      return res.status(500).json({ success: false, error: "internal server error" });
     }
   };
 }
