@@ -29,3 +29,7 @@ Karrot Market (the most popular buy and sell platform in Korea) clone project, b
 ## 🚀 Deploy
 
 - Deploy with Vercel
+
+## 보안 릴리스
+
+빌드에서는 DB를 변경하지 않습니다. 머지·릴리스 전 스키마 준비와 Preview 제약은 [보안 릴리스 절차](docs/security-release.md)를 확인하세요.

@@ -29,7 +29,8 @@ export default function withHandler({
     try {
       await handlerFn(req, res);
     } catch (error) {
-      console.error(error);
+      // Prisma/SMTP errors may contain credentials or connection strings.
+      console.error("API request failed");
       return res.status(500).json({ success: false, error: "internal server error" });
     }
   };

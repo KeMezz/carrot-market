@@ -34,7 +34,19 @@ export function createFakePrisma() {
     );
   };
 
+  let transactionTail = Promise.resolve();
   const client = {
+    // Unit-test serialization only. PostgreSQL behavior is tested separately.
+    async $transaction(action: (tx: any) => Promise<any>) {
+      const previous = transactionTail;
+      let release!: () => void;
+      transactionTail = new Promise<void>((resolve) => { release = resolve; });
+      await previous;
+      try { return await action(client); } finally { release(); }
+    },
+    async $queryRaw(strings: TemplateStringsArray) {
+      return strings.join("").includes("clock_timestamp") ? [{ now: new Date() }] : [];
+    },
     user: {
       async upsert({ where, create }: Row) {
         let user = db.users.find((u) => matches(u, where));

@@ -17,7 +17,6 @@ vi.mock("@libs/server/email", () => ({
     },
   },
 }));
-vi.mock("twilio", () => ({ default: () => ({}) }));
 
 const { default: enter } = await import("../pages/api/users/enter");
 const { default: confirm } = await import("../pages/api/users/confirm");
@@ -65,12 +64,12 @@ describe("otp helpers", () => {
   });
 
   it("does not store the plaintext code and binds it to the user", () => {
-    const stored = otp.hashCode(1, "123456");
+    const stored = otp.hashCode(1, "a".repeat(64), "123456");
     expect(stored).not.toContain("123456");
-    expect(otp.codeMatches(1, "123456", stored)).toBe(true);
-    expect(otp.codeMatches(2, "123456", stored)).toBe(false);
-    expect(otp.codeMatches(1, "123457", stored)).toBe(false);
-    expect(otp.codeMatches(1, "123456", "not-hex")).toBe(false);
+    expect(otp.codeMatches(1, "a".repeat(64), "123456", stored)).toBe(true);
+    expect(otp.codeMatches(2, "a".repeat(64), "123456", stored)).toBe(false);
+    expect(otp.codeMatches(1, "a".repeat(64), "123457", stored)).toBe(false);
+    expect(otp.codeMatches(1, "a".repeat(64), "123456", "not-hex")).toBe(false);
   });
 
   it("validates identity input types", () => {
@@ -91,12 +90,12 @@ describe("POST /api/users/enter", () => {
     expect(b.session.pendingAuth?.userId).toBe(fake.db.users[0].id);
   });
 
-  it("does not leak SMTP details and removes the code when delivery fails", async () => {
+  it("does not expose SMTP details and exhausts the code when delivery fails", async () => {
     mail.fail = true;
     const res = await browser().enter("a@example.com");
     expect(res.statusCode).toBe(500);
     expect(res.body).toEqual({ success: false });
-    expect(fake.db.tokens).toHaveLength(0);
+    expect(fake.db.tokens[0].attempts).toBe(otp.OTP_MAX_ATTEMPTS);
   });
 
   it("enforces a resend cooldown", async () => {
@@ -108,7 +107,7 @@ describe("POST /api/users/enter", () => {
     expect((await b.enter("a@example.com")).statusCode).toBe(200);
   });
 
-  it("caps issuance per identity per hour", async () => {
+  it("caps issuance per identity per rolling window", async () => {
     const b = browser();
     for (let i = 0; i < otp.OTP_MAX_ISSUES_PER_WINDOW; i++) {
       expect((await b.enter("a@example.com")).statusCode).toBe(200);
@@ -131,7 +130,7 @@ describe("POST /api/users/confirm", () => {
     expect(res.statusCode).toBe(200);
     expect(b.session.user).toEqual({ id: fake.db.users[0].id });
     expect(b.session.pendingAuth).toBeUndefined();
-    expect(fake.db.tokens).toHaveLength(0);
+    expect(fake.db.tokens[0].attempts).toBe(otp.OTP_MAX_ATTEMPTS);
     expect((await b.confirm(code)).statusCode).toBe(400);
   });
 
@@ -174,7 +173,7 @@ describe("POST /api/users/confirm", () => {
       expect((await b.confirm(wrong)).statusCode).toBe(400);
     }
     const res = await b.confirm(code);
-    expect(res.statusCode).toBe(429);
+    expect(res.statusCode).toBe(400);
     expect(b.session.user).toBeUndefined();
   });
 
@@ -185,7 +184,7 @@ describe("POST /api/users/confirm", () => {
     await b.confirm(wrong);
     vi.advanceTimersByTime(otp.OTP_RESEND_COOLDOWN_MS + 1);
     await b.enter("a@example.com");
-    // 새 코드는 새 시도 횟수를 갖지만, 발급 자체가 시간당 5회로 제한된다
+    // 새 코드는 새 시도 횟수를 갖지만, 발급 자체가 10분당 5회로 제한된다
     expect(fake.db.tokens.length).toBe(2);
     expect(fake.db.tokens[1].attempts).toBe(0);
     expect((await b.confirm(codeFromMail())).statusCode).toBe(200);
@@ -206,5 +205,102 @@ describe("POST /api/users/confirm", () => {
     const code = codeFromMail();
     const results = await Promise.all([b.confirm(code), b.confirm(code)]);
     expect(results.filter((r) => r.statusCode === 200)).toHaveLength(1);
+  });
+});
+
+
+describe("challenge binding and durable budgets", () => {
+  it("rejects phone and mixed identities before DB writes or sending", async () => {
+    for (const body of [{ phone: "821012345678" }, { phone: "821012345678", email: "a@example.com" }]) {
+      const res = createRes();
+      await enter(createReq({ body }), res);
+      expect(res.statusCode).toBe(400);
+    }
+    expect(fake.db.users).toHaveLength(0);
+    expect(sent).toHaveLength(0);
+  });
+
+  it("serializes a simultaneous issuance burst", async () => {
+    const responses = await Promise.all(Array.from({ length: 20 }, () => browser().enter("a@example.com")));
+    expect(responses.filter((r) => r.statusCode === 200)).toHaveLength(1);
+    expect(fake.db.tokens).toHaveLength(1);
+    expect(sent).toHaveLength(1);
+  });
+
+  it("does not invalidate another browser's pending login or spend its attempts", async () => {
+    const owner = browser();
+    const other = browser();
+    await owner.enter("a@example.com");
+    const ownerCode = codeFromMail();
+    vi.advanceTimersByTime(otp.OTP_RESEND_COOLDOWN_MS + 1);
+    await other.enter("a@example.com");
+    const otherCode = codeFromMail();
+    // A copied pending cookie identifies exactly the first token, never the newest.
+    const ownerPending = { ...owner.session.pendingAuth };
+    expect((await owner.confirm(ownerCode)).statusCode).toBe(200);
+    expect(fake.db.tokens[1].attempts).toBe(0);
+    expect((await other.confirm(otherCode)).statusCode).toBe(200);
+    owner.session.pendingAuth = ownerPending;
+    expect((await owner.confirm(ownerCode)).statusCode).toBe(400);
+  });
+
+  it("binds the code to a random browser secret even for the same identity", async () => {
+    const b = browser();
+    await b.enter("a@example.com");
+    const code = codeFromMail();
+    b.session.pendingAuth.binding = "f".repeat(64);
+    expect((await b.confirm(code)).statusCode).toBe(400);
+  });
+
+  it("rejects legacy pending cookies and modified issuance timestamps", async () => {
+    const b = browser();
+    await b.enter("a@example.com");
+    const code = codeFromMail();
+    const pending = { ...b.session.pendingAuth };
+    b.session.pendingAuth = { userId: pending.userId, issuedAt: pending.issuedAt };
+    expect((await b.confirm(code)).statusCode).toBe(400);
+    b.session.pendingAuth = { ...pending, issuedAt: pending.issuedAt + 1 };
+    expect((await b.confirm(code)).statusCode).toBe(400);
+    expect(fake.db.tokens[0].attempts).toBe(0);
+  });
+
+  it("expires at the TTL boundary", async () => {
+    const b = browser();
+    await b.enter("a@example.com");
+    const code = codeFromMail();
+    vi.advanceTimersByTime(otp.OTP_TTL_MS);
+    expect((await b.confirm(code)).statusCode).toBe(400);
+  });
+
+  it("retains issuance budget after successful login", async () => {
+    for (let i = 0; i < otp.OTP_MAX_ISSUES_PER_WINDOW; i++) {
+      const b = browser();
+      expect((await b.enter("a@example.com")).statusCode).toBe(200);
+      expect((await b.confirm(codeFromMail())).statusCode).toBe(200);
+      vi.advanceTimersByTime(otp.OTP_RESEND_COOLDOWN_MS + 1);
+    }
+    expect((await browser().enter("a@example.com")).statusCode).toBe(429);
+  });
+
+  it("retains issuance budget after delivery failures without logging error objects", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    mail.fail = true;
+    for (let i = 0; i < otp.OTP_MAX_ISSUES_PER_WINDOW; i++) {
+      expect((await browser().enter("a@example.com")).statusCode).toBe(500);
+      vi.advanceTimersByTime(otp.OTP_RESEND_COOLDOWN_MS + 1);
+    }
+    expect((await browser().enter("a@example.com")).statusCode).toBe(429);
+    expect(log.mock.calls.every((args) => args.length === 1 && args[0] === "Login code delivery/session persistence failed")).toBe(true);
+    log.mockRestore();
+  });
+
+  it("does not exceed the attempt budget under concurrent guesses", async () => {
+    const b = browser();
+    await b.enter("a@example.com");
+    const code = codeFromMail();
+    const wrong = code === "111111" ? "222222" : "111111";
+    await Promise.all(Array.from({ length: 20 }, () => b.confirm(wrong)));
+    expect(fake.db.tokens[0].attempts).toBe(otp.OTP_MAX_ATTEMPTS);
+    expect((await b.confirm(code)).statusCode).toBe(400);
   });
 });
