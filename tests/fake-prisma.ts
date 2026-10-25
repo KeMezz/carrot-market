@@ -1,0 +1,198 @@
+type Row = Record<string, any>;
+
+// where 절(스칼라 일치, lt, OR, product 관계)을 실제로 평가하는 최소한의 인메모리 Prisma 모델
+export function createFakePrisma() {
+  const db = {
+    users: [] as Row[],
+    tokens: [] as Row[],
+    budget: [] as Row[],
+    products: [] as Row[],
+    chatRooms: [] as Row[],
+    chatMessages: [] as Row[],
+    nextId: 1000,
+  };
+
+  const matches = (row: Row, where: Row = {}): boolean =>
+    Object.entries(where).every(([key, cond]) => {
+      if (cond === undefined) return true;
+      if (key === "OR") return (cond as Row[]).some((c) => matches(row, c));
+      if (key === "product") {
+        const product = db.products.find((p) => p.id === row.productId);
+        return !!product && matches(product, cond);
+      }
+      if (cond && typeof cond === "object" && !(cond instanceof Date)) {
+        if ("equals" in cond) return String(row[key]).toLowerCase() === cond.equals;
+        if ("lt" in cond) return row[key] < cond.lt;
+        throw new Error(`unsupported condition on ${key}`);
+      }
+      return row[key] === cond;
+    });
+
+  const sorted = (rows: Row[], orderBy?: Row) => {
+    if (!orderBy) return rows;
+    const [[key, dir]] = Object.entries(orderBy);
+    return [...rows].sort((a, b) =>
+      dir === "desc" ? b[key] - a[key] : a[key] - b[key]
+    );
+  };
+
+  let transactionTail = Promise.resolve();
+  const client = {
+    // Unit-test serialization only. PostgreSQL behavior is tested separately.
+    async $transaction(action: (tx: any) => Promise<any>) {
+      const previous = transactionTail;
+      let release!: () => void;
+      transactionTail = new Promise<void>((resolve) => { release = resolve; });
+      await previous;
+      try { return await action(client); } finally { release(); }
+    },
+    async $queryRaw(strings: TemplateStringsArray, ...values: unknown[]) {
+      const sql = strings.join("");
+      if (sql.includes("clock_timestamp")) return [{ now: new Date() }];
+      if (sql.includes("LoginBudget")) return [{ events: db.budget }];
+      // Unit-test contract only; literal SQL matching is exercised on real PG.
+      if (sql.includes("lower(email)")) return db.users
+        .filter(u => typeof u.email === "string" && u.email.toLowerCase() === values[0])
+        .sort((a, b) => a.id - b.id).slice(0, 2).map(u => ({ id: u.id }));
+      return [];
+    },
+    async $executeRaw() {},
+    loginBudget: { async update({ data }: Row) { db.budget = data.events; } },
+    user: {
+      async findMany({ where }: Row) { return db.users.filter(u => matches(u, where)); },
+      async findUnique({ where }: Row) { return db.users.find(u => matches(u, where)) ?? null; },
+      async update({ where, data }: Row) { const u = db.users.find(u => matches(u, where)); Object.assign(u, data); return u; },
+      async create({ data }: Row) { const u = { id: db.nextId++, ...data }; db.users.push(u); return u; },
+      async upsert({ where, create }: Row) {
+        let user = db.users.find((u) => matches(u, where));
+        if (!user) {
+          user = { id: db.nextId++, ...create };
+          db.users.push(user);
+        }
+        return { id: user.id };
+      },
+    },
+    token: {
+      async create({ data }: Row) {
+        if (db.tokens.some((t) => t.payload === data.payload)) {
+          throw Object.assign(new Error("unique"), { code: "P2002" });
+        }
+        const token = {
+          id: db.nextId++,
+          attempts: 0,
+          createdAt: new Date(),
+          ...data,
+        };
+        db.tokens.push(token);
+        return token;
+      },
+      async findFirst({ where, orderBy }: Row) {
+        return sorted(db.tokens.filter((t) => matches(t, where)), orderBy)[0] ?? null;
+      },
+      async findMany({ where, orderBy }: Row) {
+        return sorted(db.tokens.filter((t) => matches(t, where)), orderBy);
+      },
+      async updateMany({ where, data }: Row) {
+        const targets = db.tokens.filter((t) => matches(t, where));
+        targets.forEach((t) => {
+          for (const [key, value] of Object.entries(data) as [string, any][]) {
+            t[key] = value && value.increment ? t[key] + value.increment : value;
+          }
+        });
+        return { count: targets.length };
+      },
+      async deleteMany({ where }: Row) {
+        const before = db.tokens.length;
+        db.tokens = db.tokens.filter((t) => !matches(t, where));
+        return { count: before - db.tokens.length };
+      },
+    },
+    chatRoom: {
+      async findFirst({ where }: Row) {
+        const room = db.chatRooms.find((r) => matches(r, where));
+        if (!room) return null;
+        const product = db.products.find((p) => p.id === room.productId)!;
+        const owner = db.users.find((u) => u.id === product.userId)!;
+        return {
+          product: {
+            id: product.id,
+            name: product.name,
+            async $executeRaw() {},
+    loginBudget: { async update({ data }: Row) { db.budget = data.events; } },
+    user: {
+      async findMany({ where }: Row) { return db.users.filter(u => matches(u, where)); },
+      async findUnique({ where }: Row) { return db.users.find(u => matches(u, where)) ?? null; },
+      async update({ where, data }: Row) { const u = db.users.find(u => matches(u, where)); Object.assign(u, data); return u; },
+      async create({ data }: Row) { const u = { id: db.nextId++, ...data }; db.users.push(u); return u; }, id: owner.id, name: owner.name },
+          },
+        };
+      },
+    },
+    chatMessage: {
+      async findMany({ where }: Row) {
+        return db.chatMessages
+          .filter((m) => matches(m, where))
+          .map((m) => ({
+            id: m.id,
+            message: m.message,
+            async $executeRaw() {},
+    loginBudget: { async update({ data }: Row) { db.budget = data.events; } },
+    user: {
+      async findMany({ where }: Row) { return db.users.filter(u => matches(u, where)); },
+      async findUnique({ where }: Row) { return db.users.find(u => matches(u, where)) ?? null; },
+      async update({ where, data }: Row) { const u = db.users.find(u => matches(u, where)); Object.assign(u, data); return u; },
+      async create({ data }: Row) { const u = { id: db.nextId++, ...data }; db.users.push(u); return u; }, id: m.userId, avatar: null },
+          }));
+      },
+      async create({ data }: Row) {
+        const message = {
+          id: db.nextId++,
+          message: data.message,
+          userId: data.user.connect.id,
+          chatRoomId: data.chatRoom.connect.id,
+        };
+        db.chatMessages.push(message);
+        return message;
+      },
+    },
+  };
+
+  return { db, client };
+}
+
+export function createRes() {
+  const res: any = {
+    statusCode: 200,
+    body: undefined as any,
+    status(code: number) {
+      res.statusCode = code;
+      return res;
+    },
+    json(body: any) {
+      res.body = body;
+      return res;
+    },
+    end() {
+      return res;
+    },
+  };
+  return res;
+}
+
+export function createReq(init: {
+  method?: string;
+  body?: any;
+  query?: Record<string, any>;
+  session?: Row;
+}) {
+  const session: Row = { ...(init.session ?? {}) };
+  session.save = async () => {};
+  return {
+    method: init.method ?? "POST",
+    body: init.body,
+    query: init.query ?? {},
+    headers: {},
+    socket: { remoteAddress: "192.0.2.1" },
+    session,
+  } as any;
+}

@@ -1,0 +1,35 @@
+name: Security regression
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: carrot_test
+          POSTGRES_PASSWORD: local_test_only
+          POSTGRES_DB: carrot_otp_test
+        ports: ["55439:5432"]
+        options: >-
+          --health-cmd "pg_isready -U carrot_test -d carrot_otp_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://unused:unused@127.0.0.1:1/unused
+      SESSION_PW: ci-only-not-production-0123456789abcdef0123456789
+      LOCAL_OTP_TEST_DATABASE_URL: postgresql://carrot_test:local_test_only@127.0.0.1:55439/carrot_otp_test
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: yarn
+      - run: yarn install --frozen-lockfile --non-interactive
+      - run: yarn prisma generate
+      - run: yarn test:ci
+      - run: yarn tsc --noEmit
+      - run: yarn lint
+      - run: yarn build
