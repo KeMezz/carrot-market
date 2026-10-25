@@ -3,7 +3,8 @@ import { isIP } from "net";
 
 export function loginClientIp(req: NextApiRequest): string | null {
   // Explicit deployment contract. Never trust arbitrary forwarding headers.
-  // Vercel overwrites x-vercel-forwarded-for; direct origin access must be closed.
+  // Vercel documents x-vercel-forwarded-for as its platform copy of XFF.
+  // Require direct Vercel ingress; see docs/security-release.md for verification.
   let value: unknown;
   if (process.env.OTP_IP_SOURCE === "vercel" && process.env.VERCEL === "1") {
     value = req.headers["x-vercel-forwarded-for"];

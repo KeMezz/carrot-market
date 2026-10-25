@@ -168,6 +168,15 @@ suite("OTP transactions on disposable local PostgreSQL", () => {
     const upper = await db.user.create({ data: { name: "upper", email: "COLLISION@example.test" } });
     try {
       expect(await findLoginUser(db, "collision@example.test")).toBeNull();
+      const req = createReq({ body: { email: "Collision@EXAMPLE.TEST", challenge: "unit-token" } });
+      const res = createRes(); await enter(req, res);
+      expect(res.statusCode).toBe(400);
+      expect(req.session.pendingAuth).toBeUndefined();
+      expect(req.session.user).toBeUndefined();
+      expect(sent).toHaveLength(0);
+      expect(await db.token.count()).toBe(0);
+      expect(await db.user.findUniqueOrThrow({ where: { id: lower.id } })).toEqual(lower);
+      expect(await db.user.findUniqueOrThrow({ where: { id: upper.id } })).toEqual(upper);
       await expect(db.$executeRawUnsafe(`CREATE UNIQUE INDEX "User_email_lower_key" ON "${schema}"."User" (lower(email)) WHERE email IS NOT NULL`)).rejects.toThrow();
     } finally {
       await db.user.deleteMany({ where: { id: { in: [lower.id, upper.id] } } });
@@ -175,6 +184,63 @@ suite("OTP transactions on disposable local PostgreSQL", () => {
     }
     const users = await Promise.all(Array.from({ length: 20 }, () => findLoginUser(db, "concurrent@example.test")));
     expect(new Set(users.map(user => user!.id)).size).toBe(1);
+  });
+
+  it.each([
+    ["underscore", "john_smith@underscore.example.test", "johnxsmith@underscore.example.test"],
+    ["percent", "john%smith@percent.example.test", "john-long-smith@percent.example.test"],
+  ])("keeps %s attack delivery and confirmed account distinct from the victim", async (kind, attackEmail, victimEmail) => {
+    const victim = await db.user.create({ data: { name: "Victim", email: victimEmail } });
+    const before = await db.user.count();
+    const attacker = createReq({ body: { email: attackEmail, challenge: "unit-token" } });
+    let res = createRes(); await enter(attacker, res);
+    expect(res.statusCode).toBe(200);
+    expect(sent).toHaveLength(1);
+    expect(sent[0].to).toEqual({ address: attackEmail, name: "" });
+    const pendingUserId = attacker.session.pendingAuth.userId;
+    attacker.body = { token: sent[0].text.match(/[A-HJ-NP-Z2-9]{12}/)[0] };
+    res = createRes(); await confirm(attacker, res);
+    expect(res.statusCode).toBe(200);
+    // Log only fixture identities/IDs: never the OTP, binding, or stored payload.
+    console.info("literal-identity regression", { kind, attackEmail, victimEmail,
+      victimId: victim.id, pendingUserId, confirmedUserId: attacker.session.user.id });
+    expect(attacker.session.user.id).not.toBe(victim.id);
+    const attackUser = await db.user.findUniqueOrThrow({ where: { email: attackEmail } });
+    expect(pendingUserId).toBe(attackUser.id);
+    expect(attacker.session.user.id).toBe(attackUser.id);
+    expect(await db.user.count()).toBe(before + 1);
+    expect(await db.token.count({ where: { userId: victim.id } })).toBe(0);
+    expect(await db.user.findUniqueOrThrow({ where: { id: victim.id } })).toEqual(victim);
+
+    // The victim still logs in to their own account using a separate challenge.
+    const owner = createReq({ body: { email: victimEmail, challenge: "unit-token" } });
+    res = createRes(); await enter(owner, res);
+    expect(res.statusCode).toBe(200);
+    expect(owner.session.pendingAuth.userId).toBe(victim.id);
+    owner.body = { token: sent[1].text.match(/[A-HJ-NP-Z2-9]{12}/)[0] };
+    res = createRes(); await confirm(owner, res);
+    expect(res.statusCode).toBe(200);
+    expect(owner.session.user.id).toBe(victim.id);
+  });
+
+  it.each([
+    "normal@literal.example.test", "literal_name@literal.example.test",
+    "literal%name@literal.example.test", "o'connor@literal.example.test",
+  ])("logs in the existing mixed-case literal identity %s through enter/confirm", async email => {
+    const existing = await db.user.create({ data: { name: "Existing", email: email.toUpperCase() } });
+    const before = await db.user.count();
+    const req = createReq({ body: { email: ` ${email.toUpperCase()} `, challenge: "unit-token" } });
+    let res = createRes(); await enter(req, res);
+    expect(res.statusCode).toBe(200);
+    expect(req.session.pendingAuth.userId).toBe(existing.id);
+    expect(sent).toHaveLength(1);
+    expect(sent[0].to).toEqual({ address: email, name: "" });
+    req.body = { token: sent[0].text.match(/[A-HJ-NP-Z2-9]{12}/)[0] };
+    res = createRes(); await confirm(req, res);
+    expect(res.statusCode).toBe(200);
+    expect(req.session.user.id).toBe(existing.id);
+    expect(await db.user.count()).toBe(before);
+    expect(await db.user.findUniqueOrThrow({ where: { id: existing.id } })).toEqual(existing);
   });
 
   it("integrates real enter/confirm handlers, challenge gate, budget, identity and PG tokens", async () => {

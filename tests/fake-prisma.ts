@@ -46,10 +46,14 @@ export function createFakePrisma() {
       await previous;
       try { return await action(client); } finally { release(); }
     },
-    async $queryRaw(strings: TemplateStringsArray) {
+    async $queryRaw(strings: TemplateStringsArray, ...values: unknown[]) {
       const sql = strings.join("");
       if (sql.includes("clock_timestamp")) return [{ now: new Date() }];
       if (sql.includes("LoginBudget")) return [{ events: db.budget }];
+      // Unit-test contract only; literal SQL matching is exercised on real PG.
+      if (sql.includes("lower(email)")) return db.users
+        .filter(u => typeof u.email === "string" && u.email.toLowerCase() === values[0])
+        .sort((a, b) => a.id - b.id).slice(0, 2).map(u => ({ id: u.id }));
       return [];
     },
     async $executeRaw() {},
