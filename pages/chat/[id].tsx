@@ -68,10 +68,10 @@ const ChatDetail: NextPage = () => {
   return (
     <Layout
       canGoBack
-      title={`${chatMessagesData?.chatRoom.product.name ?? ""}`}
+      title={`${chatMessagesData?.chatRoom?.product.name ?? ""}`}
     >
       <section className="p-4 my-8 flex flex-col gap-4 mb-20">
-        {chatMessagesData?.messages.map((message) => (
+        {chatMessagesData?.messages?.map((message) => (
           <Bubble
             reversed={user?.id === message.user.id}
             avatar={message.user.avatar}
