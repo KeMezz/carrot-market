@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createFakePrisma, createReq, createRes } from "./fake-prisma";
 
 const fake = createFakePrisma();
-const sent: { to: string; text: string }[] = [];
+const sent: { to: { address: string; name: string }; text: string }[] = [];
 const mail = { fail: false };
 
 vi.mock("@libs/server/client", () => ({ default: fake.client }));
@@ -11,19 +11,23 @@ vi.mock("@libs/server/withSession", () => ({
 }));
 vi.mock("@libs/server/email", () => ({
   default: {
-    sendMail: async (options: { to: string; text: string }) => {
+    sendMail: async (options: { to: { address: string; name: string }; text: string }) => {
       if (mail.fail) throw new Error("smtp down");
       sent.push(options);
     },
   },
 }));
 
+vi.mock("@libs/server/login-challenge", () => ({
+  loginClientIp: (req: any) => req.socket.remoteAddress,
+  verifyLoginChallenge: async () => true,
+}));
 const { default: enter } = await import("../pages/api/users/enter");
 const { default: confirm } = await import("../pages/api/users/confirm");
 const otp = await import("../libs/server/otp");
 
 const codeFromMail = (index = sent.length - 1) =>
-  sent[index].text.match(/\d{6}/)![0];
+  sent[index].text.match(/[A-HJ-NP-Z2-9]{12}/)![0];
 
 // 브라우저 하나를 흉내낸다: 세션 객체(쿠키)를 요청 사이에 유지한다
 function browser() {
@@ -51,15 +55,16 @@ beforeEach(() => {
   vi.setSystemTime(new Date("2026-10-25T00:00:00Z"));
   fake.db.users = [];
   fake.db.tokens = [];
+  fake.db.budget = [];
   sent.length = 0;
   mail.fail = false;
 });
 afterEach(() => vi.useRealTimers());
 
 describe("otp helpers", () => {
-  it("generates six digit codes from the full range", () => {
+  it("generates 12 uniform base32 symbols (60 bits)", () => {
     for (let i = 0; i < 2000; i++) {
-      expect(otp.generateCode()).toMatch(/^[1-9]\d{5}$/);
+      expect(otp.generateCode()).toMatch(/^[A-HJ-NP-Z2-9]{12}$/);
     }
   });
 
@@ -98,27 +103,26 @@ describe("POST /api/users/enter", () => {
     expect(fake.db.tokens[0].attempts).toBe(otp.OTP_MAX_ATTEMPTS);
   });
 
-  it("enforces a resend cooldown", async () => {
-    const b = browser();
-    await b.enter("a@example.com");
-    expect((await b.enter("a@example.com")).statusCode).toBe(429);
-    expect(sent).toHaveLength(1);
-    vi.advanceTimersByTime(otp.OTP_RESEND_COOLDOWN_MS + 1);
-    expect((await b.enter("a@example.com")).statusCode).toBe(200);
+  it("cannot reserve a victim's email slots from another IP", async () => {
+    const attacker = browser();
+    for (let i = 0; i < 5; i++) expect((await attacker.enter("victim@example.com")).statusCode).toBe(200);
+    expect((await attacker.enter("victim@example.com")).statusCode).toBe(429);
+    const req = createReq({ body: { email: "victim@example.com" } });
+    req.socket.remoteAddress = "192.0.2.2";
+    const res = createRes();
+    await enter(req, res);
+    expect(res.statusCode).toBe(200);
+    expect(sent).toHaveLength(6);
   });
 
-  it("caps issuance per identity per rolling window", async () => {
-    const b = browser();
-    for (let i = 0; i < otp.OTP_MAX_ISSUES_PER_WINDOW; i++) {
-      expect((await b.enter("a@example.com")).statusCode).toBe(200);
-      vi.advanceTimersByTime(otp.OTP_RESEND_COOLDOWN_MS + 1);
-    }
-    expect((await b.enter("a@example.com")).statusCode).toBe(429);
-    // 다른 이메일은 영향을 받지 않는다
-    expect((await b.enter("b@example.com")).statusCode).toBe(200);
-    vi.advanceTimersByTime(otp.OTP_ISSUE_WINDOW_MS);
-    expect((await b.enter("a@example.com")).statusCode).toBe(200);
+  it("blocks one IP across addresses and cookie rotation before user creation", async () => {
+    for (let i = 0; i < 5; i++) expect((await browser().enter(`user${i}@example.com`)).statusCode).toBe(200);
+    expect((await browser().enter("new@example.com")).statusCode).toBe(429);
+    expect(fake.db.users).toHaveLength(5);
+    expect(fake.db.tokens).toHaveLength(5);
+    expect(sent).toHaveLength(5);
   });
+
 });
 
 describe("POST /api/users/confirm", () => {
@@ -168,7 +172,7 @@ describe("POST /api/users/confirm", () => {
     const b = browser();
     await b.enter("a@example.com");
     const code = codeFromMail();
-    const wrong = code === "111111" ? "222222" : "111111";
+    const wrong = code === "AAAAAAAAAAAA" ? "BBBBBBBBBBBB" : "AAAAAAAAAAAA";
     for (let i = 0; i < otp.OTP_MAX_ATTEMPTS; i++) {
       expect((await b.confirm(wrong)).statusCode).toBe(400);
     }
@@ -180,11 +184,11 @@ describe("POST /api/users/confirm", () => {
   it("issues a fresh code with its own attempt counter after the cooldown", async () => {
     const b = browser();
     await b.enter("a@example.com");
-    const wrong = codeFromMail() === "111111" ? "222222" : "111111";
+    const wrong = codeFromMail() === "AAAAAAAAAAAA" ? "BBBBBBBBBBBB" : "AAAAAAAAAAAA";
     await b.confirm(wrong);
-    vi.advanceTimersByTime(otp.OTP_RESEND_COOLDOWN_MS + 1);
+    vi.advanceTimersByTime(60_000 + 1);
     await b.enter("a@example.com");
-    // 새 코드는 새 시도 횟수를 갖지만, 발급 자체가 10분당 5회로 제한된다
+    // 발송 예산은 로그인 성공·실패와 무관하다.
     expect(fake.db.tokens.length).toBe(2);
     expect(fake.db.tokens[1].attempts).toBe(0);
     expect((await b.confirm(codeFromMail())).statusCode).toBe(200);
@@ -222,9 +226,9 @@ describe("challenge binding and durable budgets", () => {
 
   it("serializes a simultaneous issuance burst", async () => {
     const responses = await Promise.all(Array.from({ length: 20 }, () => browser().enter("a@example.com")));
-    expect(responses.filter((r) => r.statusCode === 200)).toHaveLength(1);
-    expect(fake.db.tokens).toHaveLength(1);
-    expect(sent).toHaveLength(1);
+    expect(responses.filter((r) => r.statusCode === 200)).toHaveLength(5);
+    expect(fake.db.tokens).toHaveLength(5);
+    expect(sent).toHaveLength(5);
   });
 
   it("does not invalidate another browser's pending login or spend its attempts", async () => {
@@ -232,7 +236,7 @@ describe("challenge binding and durable budgets", () => {
     const other = browser();
     await owner.enter("a@example.com");
     const ownerCode = codeFromMail();
-    vi.advanceTimersByTime(otp.OTP_RESEND_COOLDOWN_MS + 1);
+    vi.advanceTimersByTime(60_000 + 1);
     await other.enter("a@example.com");
     const otherCode = codeFromMail();
     // A copied pending cookie identifies exactly the first token, never the newest.
@@ -273,11 +277,11 @@ describe("challenge binding and durable budgets", () => {
   });
 
   it("retains issuance budget after successful login", async () => {
-    for (let i = 0; i < otp.OTP_MAX_ISSUES_PER_WINDOW; i++) {
+    for (let i = 0; i < 5; i++) {
       const b = browser();
       expect((await b.enter("a@example.com")).statusCode).toBe(200);
       expect((await b.confirm(codeFromMail())).statusCode).toBe(200);
-      vi.advanceTimersByTime(otp.OTP_RESEND_COOLDOWN_MS + 1);
+      vi.advanceTimersByTime(60_000 + 1);
     }
     expect((await browser().enter("a@example.com")).statusCode).toBe(429);
   });
@@ -285,9 +289,9 @@ describe("challenge binding and durable budgets", () => {
   it("retains issuance budget after delivery failures without logging error objects", async () => {
     const log = vi.spyOn(console, "error").mockImplementation(() => {});
     mail.fail = true;
-    for (let i = 0; i < otp.OTP_MAX_ISSUES_PER_WINDOW; i++) {
+    for (let i = 0; i < 5; i++) {
       expect((await browser().enter("a@example.com")).statusCode).toBe(500);
-      vi.advanceTimersByTime(otp.OTP_RESEND_COOLDOWN_MS + 1);
+      vi.advanceTimersByTime(60_000 + 1);
     }
     expect((await browser().enter("a@example.com")).statusCode).toBe(429);
     expect(log.mock.calls.every((args) => args.length === 1 && args[0] === "Login code delivery/session persistence failed")).toBe(true);
@@ -298,7 +302,7 @@ describe("challenge binding and durable budgets", () => {
     const b = browser();
     await b.enter("a@example.com");
     const code = codeFromMail();
-    const wrong = code === "111111" ? "222222" : "111111";
+    const wrong = code === "AAAAAAAAAAAA" ? "BBBBBBBBBBBB" : "AAAAAAAAAAAA";
     await Promise.all(Array.from({ length: 20 }, () => b.confirm(wrong)));
     expect(fake.db.tokens[0].attempts).toBe(otp.OTP_MAX_ATTEMPTS);
     expect((await b.confirm(code)).statusCode).toBe(400);

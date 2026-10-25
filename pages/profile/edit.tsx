@@ -4,22 +4,19 @@ import Layout from "@components/template/layout";
 import useImageId from "@libs/client/useImageId";
 import useMutation from "@libs/client/useMutation";
 import useUser from "@libs/client/useUser";
-import { ProfileErrorResponse } from "@pages/api/users/me";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 interface EditProfileForm {
-  email?: string;
-  phone?: string;
   name?: string;
   avatar?: FileList;
 }
 
 interface EditProfileResponse {
   success: boolean;
-  error?: ProfileErrorResponse;
+  error?: string;
 }
 
 const Edit = () => {
@@ -35,19 +32,10 @@ const Edit = () => {
     register,
     handleSubmit,
     setValue,
-    formState: { errors },
-    setError,
     watch,
   } = useForm<EditProfileForm>();
-  const onValid = async ({ email, phone, name, avatar }: EditProfileForm) => {
+  const onValid = async ({ name, avatar }: EditProfileForm) => {
     if (loading) return;
-
-    // block submit when the form is completely empty
-    if (email === "" && phone === "" && name === "") {
-      setError("root", {
-        message: "이메일 혹은 휴대폰 번호 중 하나 이상은 반드시 입력해주세요.",
-      });
-    }
 
     // if user touches avatar input, we request the cloudflare upload url.
     if (avatar && avatar.length > 0 && user) {
@@ -56,24 +44,19 @@ const Edit = () => {
         fileName: user?.id + "",
       });
       editProfile({
-        email,
-        phone,
         name,
         avatarId,
       });
     }
 
     // when avatar image is not provided, we just send it without image.
-    editProfile({ email, phone, name });
-    router.push("/profile");
+    else editProfile({ name });
   };
 
   // fills form initially, with previous user profile data
   useEffect(() => {
     if (user) {
       setValue("name", user.name ?? "");
-      setValue("email", user.email ?? "");
-      setValue("phone", user.phone ?? "");
     }
     if (user?.avatar) {
       setAvatarPreview(
@@ -82,15 +65,9 @@ const Edit = () => {
     }
   }, [user, setValue]);
 
-  // if server responses with error object, we'll show error to users too.
   useEffect(() => {
-    if (data && data?.error?.email) {
-      setError("email", { message: data.error.email });
-    }
-    if (data && data?.error?.phone) {
-      setError("phone", { message: data.error.phone });
-    }
-  }, [data, setError]);
+    if (data?.success) router.push("/profile");
+  }, [data, router]);
 
   // define user avatar variables
   const avatar = watch("avatar");
@@ -144,28 +121,9 @@ const Edit = () => {
             register={register("name")}
             type="text"
           />
-          <TextInput
-            id="email"
-            name="Email Address"
-            register={register("email")}
-            type="text"
-          />
-          <TextInput
-            id="phone"
-            name="Phone Number"
-            register={register("phone")}
-            type="number"
-          />
-          {errors.phone ? (
-            <p className="text-center text-red-500 text-sm font-bold">
-              {errors.phone.message}
-            </p>
-          ) : null}
-          {errors.email ? (
-            <p className="text-center text-red-500 text-sm font-bold">
-              {errors.email.message}
-            </p>
-          ) : null}
+          <p>로그인 이메일: {user?.email ?? "없음"}</p>
+          <p className="text-sm text-gray-600">이메일과 전화번호는 이 화면에서 변경할 수 없습니다.</p>
+          {data && !data.success ? <p role="alert">프로필을 저장하지 못했습니다.</p> : null}
           <FilledBtn
             title={
               loading || uploadImageLoading ? "Loading..." : "Update Profile"

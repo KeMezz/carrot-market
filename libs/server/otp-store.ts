@@ -1,8 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { randomBytes } from "crypto";
 import {
-  OTP_ISSUE_WINDOW_MS, OTP_MAX_ISSUES_PER_WINDOW, OTP_MAX_ATTEMPTS,
-  OTP_RESEND_COOLDOWN_MS, PendingAuth, generateCode, hashCode,
+  OTP_TTL_MS, OTP_MAX_ATTEMPTS, PendingAuth, generateCode, hashCode,
   codeMatches, isExpired,
 } from "./otp";
 
@@ -24,15 +23,8 @@ async function withIdentityLock<T>(
 export async function issueLoginCode(db: PrismaClient, userId: number) {
   return withIdentityLock(db, userId, async (tx, now) => {
     await tx.token.deleteMany({
-      where: { userId, createdAt: { lt: new Date(now.getTime() - OTP_ISSUE_WINDOW_MS) } },
+      where: { userId, createdAt: { lt: new Date(now.getTime() - OTP_TTL_MS) } },
     });
-    const recent = await tx.token.findMany({
-      where: { userId }, orderBy: { createdAt: "desc" }, select: { createdAt: true },
-    });
-    if (recent.length >= OTP_MAX_ISSUES_PER_WINDOW ||
-        (recent[0] && now.getTime() - recent[0].createdAt.getTime() < OTP_RESEND_COOLDOWN_MS)) {
-      return null;
-    }
     const code = generateCode();
     const binding = randomBytes(32).toString("hex");
     const token = await tx.token.create({
@@ -53,8 +45,8 @@ export async function consumeLoginCode(db: PrismaClient, pending: PendingAuth, c
     if (token.attempts >= OTP_MAX_ATTEMPTS) return false;
 
     const matches = codeMatches(pending.userId, pending.binding, code, token.payload);
-    // Retain exhausted/consumed records for the issuance window, so successful
-    // logins and failed delivery cannot reset the mail/guess budget.
+    // Retain exhausted/consumed records until expiry. Sending limits are
+    // reserved separately and never reset by login, cookie rotation or failure.
     await tx.token.updateMany({
       where: { id: token.id },
       data: { attempts: matches ? OTP_MAX_ATTEMPTS : token.attempts + 1 },

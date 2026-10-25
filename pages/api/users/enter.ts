@@ -4,25 +4,30 @@ import withHandler, { ResponseType } from "@libs/server/withHandler";
 import { withApiSession } from "@libs/server/withSession";
 import nodemailerClient from "@libs/server/email";
 import { OTP_MAX_ATTEMPTS, parseIdentity } from "@libs/server/otp";
+import { findLoginUser } from "@libs/server/login-identity";
+import { verifyLoginChallenge, loginClientIp } from "@libs/server/login-challenge";
+import { reserveLoginDelivery } from "@libs/server/login-budget";
 import { issueLoginCode } from "@libs/server/otp-store";
 
 async function handler(req: NextApiRequest, res: NextApiResponse<ResponseType>) {
   const identity = parseIdentity(req.body);
   if (!identity) return res.status(400).json({ success: false });
 
-  const user = await client.user.upsert({
-    where: identity, update: {}, create: { name: "Anonymous", ...identity }, select: { id: true },
-  }).catch(async (error: unknown) => {
-    // Prisma may emulate an upsert; concurrent first requests can race its insert.
-    if ((error as { code?: string })?.code !== "P2002") throw error;
-    return client.user.findUniqueOrThrow({ where: identity, select: { id: true } });
-  });
+  const ip = loginClientIp(req);
+  if (!ip || !await verifyLoginChallenge(req.body?.challenge, ip)) {
+    return res.status(503).json({ success: false });
+  }
+  // Reserve before creating any User/Token or sending mail. Never refund errors:
+  // external SMTP acceptance and our transaction cannot commit atomically.
+  if (!await reserveLoginDelivery(client, ip)) return res.status(429).json({ success: false });
+  const user = await findLoginUser(client, identity.email);
+  if (!user) return res.status(400).json({ success: false });
   const issued = await issueLoginCode(client, user.id);
   if (!issued) return res.status(429).json({ success: false });
 
   try {
     await nodemailerClient.sendMail({
-      from: process.env.MAIL_ID, to: identity.email,
+      from: process.env.MAIL_ID, to: { address: identity.email, name: "" },
       subject: "Carrot Market Authentication Code",
       text: `Your login token is ${issued.code}`,
     });

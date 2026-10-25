@@ -5,6 +5,7 @@ export function createFakePrisma() {
   const db = {
     users: [] as Row[],
     tokens: [] as Row[],
+    budget: [] as Row[],
     products: [] as Row[],
     chatRooms: [] as Row[],
     chatMessages: [] as Row[],
@@ -20,6 +21,7 @@ export function createFakePrisma() {
         return !!product && matches(product, cond);
       }
       if (cond && typeof cond === "object" && !(cond instanceof Date)) {
+        if ("equals" in cond) return String(row[key]).toLowerCase() === cond.equals;
         if ("lt" in cond) return row[key] < cond.lt;
         throw new Error(`unsupported condition on ${key}`);
       }
@@ -45,9 +47,18 @@ export function createFakePrisma() {
       try { return await action(client); } finally { release(); }
     },
     async $queryRaw(strings: TemplateStringsArray) {
-      return strings.join("").includes("clock_timestamp") ? [{ now: new Date() }] : [];
+      const sql = strings.join("");
+      if (sql.includes("clock_timestamp")) return [{ now: new Date() }];
+      if (sql.includes("LoginBudget")) return [{ events: db.budget }];
+      return [];
     },
+    async $executeRaw() {},
+    loginBudget: { async update({ data }: Row) { db.budget = data.events; } },
     user: {
+      async findMany({ where }: Row) { return db.users.filter(u => matches(u, where)); },
+      async findUnique({ where }: Row) { return db.users.find(u => matches(u, where)) ?? null; },
+      async update({ where, data }: Row) { const u = db.users.find(u => matches(u, where)); Object.assign(u, data); return u; },
+      async create({ data }: Row) { const u = { id: db.nextId++, ...data }; db.users.push(u); return u; },
       async upsert({ where, create }: Row) {
         let user = db.users.find((u) => matches(u, where));
         if (!user) {
@@ -102,7 +113,13 @@ export function createFakePrisma() {
           product: {
             id: product.id,
             name: product.name,
-            user: { id: owner.id, name: owner.name },
+            async $executeRaw() {},
+    loginBudget: { async update({ data }: Row) { db.budget = data.events; } },
+    user: {
+      async findMany({ where }: Row) { return db.users.filter(u => matches(u, where)); },
+      async findUnique({ where }: Row) { return db.users.find(u => matches(u, where)) ?? null; },
+      async update({ where, data }: Row) { const u = db.users.find(u => matches(u, where)); Object.assign(u, data); return u; },
+      async create({ data }: Row) { const u = { id: db.nextId++, ...data }; db.users.push(u); return u; }, id: owner.id, name: owner.name },
           },
         };
       },
@@ -114,7 +131,13 @@ export function createFakePrisma() {
           .map((m) => ({
             id: m.id,
             message: m.message,
-            user: { id: m.userId, avatar: null },
+            async $executeRaw() {},
+    loginBudget: { async update({ data }: Row) { db.budget = data.events; } },
+    user: {
+      async findMany({ where }: Row) { return db.users.filter(u => matches(u, where)); },
+      async findUnique({ where }: Row) { return db.users.find(u => matches(u, where)) ?? null; },
+      async update({ where, data }: Row) { const u = db.users.find(u => matches(u, where)); Object.assign(u, data); return u; },
+      async create({ data }: Row) { const u = { id: db.nextId++, ...data }; db.users.push(u); return u; }, id: m.userId, avatar: null },
           }));
       },
       async create({ data }: Row) {
@@ -164,6 +187,8 @@ export function createReq(init: {
     method: init.method ?? "POST",
     body: init.body,
     query: init.query ?? {},
+    headers: {},
+    socket: { remoteAddress: "192.0.2.1" },
     session,
   } as any;
 }

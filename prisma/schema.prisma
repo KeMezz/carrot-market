@@ -194,3 +194,9 @@ model ChatMessage {
   @@index([userId])
   @@index([chatRoomId])
 }
+
+// Fixed singleton row; no foreign keys or user-controlled keys.
+model LoginBudget {
+  id     Int  @id
+  events Json
+}

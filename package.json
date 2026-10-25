@@ -7,7 +7,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
-    "release:migrate": "node scripts/release-migrate.cjs"
+    "release:migrate": "node scripts/release-migrate.cjs",
+    "test:ci": "REQUIRE_LOCAL_OTP_TESTS=1 vitest run"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
